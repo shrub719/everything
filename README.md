@@ -1,0 +1,2 @@
+# everything
+EVERYTHING rhythm game
