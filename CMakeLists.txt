@@ -19,9 +19,12 @@ target_include_directories(everything_game PRIVATE
     include
 )
 
+add_subdirectory(glad/cmake glad_cmake)
+glad_add_library(glad_gl_core_33 REPRODUCIBLE API gl:core=3.3)
+
 target_link_libraries(everything_game PRIVATE 
     glfw
-    OpenGL::GL
+    glad_gl_core_33
     dl
     pthread
     m

@@ -1,3 +1,6 @@
+#define GLAD_GL_IMPLEMENTATION
+#include <glad/gl.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "types.h"
 #include "input.h"
@@ -16,8 +19,10 @@ int win_init() {
         return 1;
     }
 
-    glfwSwapInterval(1);    // vsync?
     glfwMakeContextCurrent(window);
+    gladLoadGL(glfwGetProcAddress);
+
+    glfwSwapInterval(1);    // vsync?
     glfwSetKeyCallback(window, inp_callback);
 
     return 0;
