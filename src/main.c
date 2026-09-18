@@ -10,7 +10,6 @@ int main(void) {
 
     au_play_sfx(0);
 
-    /* Loop until the user closes the window */
     while (win_loop()) {}
 
     win_uninit();

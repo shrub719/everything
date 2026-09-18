@@ -1,30 +1,37 @@
 #include <GLFW/glfw3.h>
 #include "types.h"
+#include "input.h"
+
+const u16 HEIGHT = 480;
+const u16 WIDTH = 960;
 
 GLFWwindow* window;
 
 int win_init() {
     if (!glfwInit()) return 1;
     
-    window = glfwCreateWindow(640, 480, "EVERYTHING", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "EVERYTHING", NULL, NULL);
     if (!window) {
         glfwTerminate();
         return 1;
     }
 
+    glfwSwapInterval(1);    // vsync?
     glfwMakeContextCurrent(window);
+    glfwSetKeyCallback(window, inp_callback);
 
     return 0;
 }
 
 void win_uninit() {
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
 
 int win_loop() {
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
-    glfwPollEvents();
+    glfwPollEvents();       // do drawing and input in separate threads? is that already the case?
     return !glfwWindowShouldClose(window);
 }
 
