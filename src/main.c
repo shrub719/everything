@@ -20,14 +20,9 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    // miniaudio
-    ma_result result;
-    ma_engine engine;
-    result = ma_engine_init(NULL, &engine);
-    if (result != MA_SUCCESS) {
-        return result;
-    }
-    ma_engine_play_sound(&engine, "assets/test.wav", NULL);
+    au_init();
+    au_play_sfx(0);
+    au_uninit();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
