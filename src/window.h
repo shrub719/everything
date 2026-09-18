@@ -4,5 +4,5 @@
 int win_init();
 void win_uninit();
 
-int win_loop();
+void win_setup_level();
 

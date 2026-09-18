@@ -10,7 +10,7 @@ int main(void) {
 
     au_play_sfx(0);
 
-    while (win_loop()) {}
+    win_setup_level();
 
     win_uninit();
     au_uninit();
