@@ -17,8 +17,10 @@ int au_init() {
     result = ma_engine_init(NULL, &au_engine);
 
     if (result != MA_SUCCESS) {
-        return result;
+        return 1;
     }
+    
+    return 0;
 }
 
 void au_uninit() {

@@ -1,43 +1,21 @@
-#include <GLFW/glfw3.h>
-#include "miniaudio.h"
+#include "audio.h"
+#include "window.h"
 
-int main(void)
-{
-    GLFWwindow* window;
+int main(void) {
+    int result;
+    result = win_init();
+    if (result != 0) return result;
+    result = au_init();
+    if (result != 0) return result;
 
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-
-    au_init();
     au_play_sfx(0);
-    au_uninit();
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+    while (win_loop()) {}
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+    win_uninit();
+    au_uninit();
 
-        /* Poll for and process events */
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
     return 0;
 }
 

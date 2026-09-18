@@ -11,7 +11,7 @@ find_package(glfw3 CONFIG REQUIRED)
 add_executable(everything_game 
     src/main.c
     src/audio.c
-    src/types.h
+    src/window.c
 )
 
 target_include_directories(everything_game PRIVATE
