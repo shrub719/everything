@@ -56,8 +56,9 @@ const char* fragment_shader =
 "#version 410 core\n"
 "in vec3 gl_FragCoord;"
 "out vec4 frag_colour;"
+"uniform vec2 window_size;"
 "void main() {"
-"  frag_colour = vec4(0.0, gl_FragCoord.x/960.0, gl_FragCoord.y/480.0, 1.0);"
+"  frag_colour = vec4(0.0, gl_FragCoord.x/window_size.x, gl_FragCoord.y/window_size.y, 1.0);"
 "}";
 
 void handle_shader_error(GLuint index) {
@@ -86,7 +87,7 @@ void handle_program_error(GLuint index) {
     }
 }
 
-void win_setup_level() {
+void win_loop() {
     float points[] = {
         0.0f, 0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
@@ -120,6 +121,7 @@ void win_setup_level() {
     glAttachShader(shader_program, fs);
     glAttachShader(shader_program, vs);
     glLinkProgram(shader_program);
+    GLuint uniform_window_size = glGetUniformLocation(shader_program, "window_size") ;
     handle_program_error(shader_program);
 
     int width, height = WIDTH, HEIGHT;
@@ -148,6 +150,7 @@ void win_setup_level() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader_program);
+        glUniform2f(uniform_window_size, width, height);
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
