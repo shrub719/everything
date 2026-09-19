@@ -6,8 +6,9 @@
 #include "types.h"
 #include "input.h"
 
-const u16 HEIGHT = 480;
-const u16 WIDTH = 960;
+const u16 INIT_HEIGHT = 480;
+const u16 INIT_WIDTH = 960;
+const float RATIO = INIT_WIDTH/INIT_HEIGHT;
 
 GLFWwindow* window;
 
@@ -16,7 +17,7 @@ void error_callback(int error, const char* description) {
 }
 
 void frame_buffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, height * RATIO, height);
 }
 
 
@@ -30,7 +31,7 @@ int win_init() {
     glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "EVERYTHING", NULL, NULL);
+    window = glfwCreateWindow(INIT_WIDTH, INIT_HEIGHT, "EVERYTHING", NULL, NULL);
     if (!window) {
         glfwTerminate();
         return 1;
@@ -155,8 +156,6 @@ void win_loop() {
     GLint uniform_time = glGetUniformLocation(shader_program, "time");
     handle_program_error(shader_program);
 
-    int width = WIDTH;
-    int height = HEIGHT;
     double prev_s = glfwGetTime();
     double cooldown_s = 0.1f;
     double curr_s, elapsed_s, fps;
