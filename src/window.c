@@ -15,6 +15,11 @@ void error_callback(int error, const char* description) {
     fprintf(stderr, "glfw error: code %i\n%s\n", error, description);
 }
 
+void frame_buffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
+
 int win_init() {
     glfwSetErrorCallback(error_callback);
 
@@ -36,6 +41,7 @@ int win_init() {
 
     glfwSwapInterval(0);    // vsync?
     glfwSetKeyCallback(window, inp_callback);
+    glfwSetFramebufferSizeCallback(window, frame_buffer_size_callback);
 
     return 0;
 }
@@ -170,9 +176,6 @@ void win_loop() {
 
         glfwPollEvents();       // do drawing and input in separate threads? is that already the case?
         
-        glfwGetWindowSize(window, &width, &height);
-        glViewport(0, 0, width, height);
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader_program);
