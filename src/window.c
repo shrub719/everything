@@ -48,17 +48,23 @@ void win_uninit() {
 const char* vertex_shader =
 "#version 410 core\n"
 "in vec3 vp;"
+"in vec3 vc;"
+"uniform float time;"
+"out vec3 color;"
 "void main() {"
-"  gl_Position = vec4(vp, 1.0);"
+"  vec3 p = vp;"
+"  p.y += p.x * sin(time);"
+"  p.x = p.x * cos(time);"
+"  gl_Position = vec4(p, 1.0);"
+"  color = vc;"
 "}";
 
 const char* fragment_shader =
 "#version 410 core\n"
-"in vec3 gl_FragCoord;"
-"out vec4 frag_colour;"
-"uniform vec2 window_size;"
+"in vec3 color;"
+"out vec4 frag_color;"
 "void main() {"
-"  frag_colour = vec4(0.0, gl_FragCoord.x/window_size.x, gl_FragCoord.y/window_size.y, 1.0);"
+"  frag_color = vec4(color, 1.0);"
 "}";
 
 void handle_shader_error(GLuint index) {
@@ -89,23 +95,40 @@ void handle_program_error(GLuint index) {
 
 void win_loop() {
     float points[] = {
-        0.0f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f
+        0.5f, 0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
     };
 
-    GLuint vbo = 0;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, 9*sizeof(float), points, GL_STATIC_DRAW);
+    float colors[] = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f,
+    };
+
+    GLuint points_vbo = 0;
+    glGenBuffers(1, &points_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+    glBufferData(GL_ARRAY_BUFFER, 15*sizeof(float), points, GL_STATIC_DRAW);
+
+    GLuint colors_vbo = 0;
+    glGenBuffers(1, &colors_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+    glBufferData(GL_ARRAY_BUFFER, 15*sizeof(float), colors, GL_STATIC_DRAW);
 
     GLuint vao = 0;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    int params = -1;
+    glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vertex_shader, NULL);
@@ -120,15 +143,18 @@ void win_loop() {
     GLuint shader_program = glCreateProgram();
     glAttachShader(shader_program, fs);
     glAttachShader(shader_program, vs);
+    glBindAttribLocation(shader_program, 0, "vp");
+    glBindAttribLocation(shader_program, 1, "vc");
     glLinkProgram(shader_program);
-    GLuint uniform_window_size = glGetUniformLocation(shader_program, "window_size") ;
+    GLint uniform_time = glGetUniformLocation(shader_program, "time");
     handle_program_error(shader_program);
 
-    int width, height = WIDTH, HEIGHT;
+    int width = WIDTH;
+    int height = HEIGHT;
     double prev_s = glfwGetTime();
     double cooldown_s = 0.1f;
     double curr_s, elapsed_s, fps;
-    char title[20];
+    char title[256];
 
     while (!glfwWindowShouldClose(window)) {
         curr_s = glfwGetTime();
@@ -150,7 +176,7 @@ void win_loop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader_program);
-        glUniform2f(uniform_window_size, width, height);
+        glUniform1f(uniform_time, curr_s);
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
