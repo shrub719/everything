@@ -69,6 +69,9 @@ void r_init_note_renderer() {
     glBindAttribLocation(note_renderer.shader, 0, "v_pos");
     glLinkProgram(note_renderer.shader);
     handle_program_error(note_renderer.shader);
+    
+    glDeleteShader(vs);
+    glDeleteShader(fs);
 }
 
 void r_draw_notes() {
@@ -83,10 +86,11 @@ void r_draw_notes() {
         0.2, 0.2,
     };
 
-    glUseProgram(note_renderer.shader);
     glBindBuffer(GL_ARRAY_BUFFER, note_renderer.vbo);
-    glBindVertexArray(note_renderer.vao);
     glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+
+    glBindVertexArray(note_renderer.vao);
+    glUseProgram(note_renderer.shader);
     glDrawArrays(GL_LINES, 0, 8);
 }
 

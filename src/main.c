@@ -24,8 +24,8 @@ int main(void) {
         win_push();
     }
 
-    win_uninit();
     au_uninit();
+    win_uninit();
 
     return 0;
 }
