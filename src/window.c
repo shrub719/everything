@@ -6,12 +6,11 @@
 #include <stdbool.h>
 #include "types.h"
 #include "audio.h"
+#include "window.h"
 
 const u16 INIT_HEIGHT = 480;
 const u16 INIT_WIDTH = 960;
 const float RATIO = (float)INIT_WIDTH / (float)INIT_HEIGHT;
-
-typedef GLFWwindow* Window;
 
 void error_callback(int error, const char* description) {
     fprintf(stderr, "glfw error: code %i\n%s\n", error, description);
@@ -20,10 +19,6 @@ void error_callback(int error, const char* description) {
 void frame_buffer_size_callback(Window window, int width, int height) {
     glViewport(0, 0, height * RATIO, height);
 }
-
-typedef struct {
-    bool keys[GLFW_KEY_LAST + 1];
-} Input;
 
 void input_callback(Window window, int key, int scancode, int action, int mods) {
     Input* input = glfwGetWindowUserPointer(window);

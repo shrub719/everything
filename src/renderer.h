@@ -1,8 +1,11 @@
+#pragma once
 #include "types.h"
 #include <glad/gl.h>
 
 #define WIDTH 960
 #define HEIGHT 480
+
+typedef u32 Color;
 
 typedef struct {
     u32 buffer[WIDTH * HEIGHT];

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "shaders.h"
 #include "types.h"
+#include "renderer.h"
 
 void handle_shader_error(GLuint index) {
     int params = -1;
@@ -34,8 +35,6 @@ void handle_program_error(GLuint index) {
 #define WIDTH 960
 #define HEIGHT 480
 
-typedef u32 Color;
-
 Color rgb(u8 r, u8 g, u8 b) {
     Color color = 0x000000FF;
     color |= r << 16;
@@ -43,15 +42,6 @@ Color rgb(u8 r, u8 g, u8 b) {
     color |= b << 0;
     return color;
 }
-
-typedef struct {
-    Color buffer[WIDTH * HEIGHT];
-    GLuint texture;
-    GLuint vao;
-    GLuint vbo;
-    GLuint shader;
-    GLint buffer_uniform;
-} Renderer;
 
 void clear_buffer(Renderer* renderer) {
     for (int i = 0; i < WIDTH * HEIGHT; i++) {
@@ -133,8 +123,8 @@ void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, i
 void draw_notes(Renderer* renderer) {
     draw_line(renderer, 0, 0, 960, 480, 0xFFFFFFFF);
     
-    for (int i = 0; i < 10000; i++) {
-        draw_triangle(renderer, 0, 0, 0, 10, 10, 10, rgb(255, 0, 255));
+    for (int i = 0; i < 5; i++) {
+        draw_triangle(renderer, 0, 0, 0, 480, 960, 480, rgb(255, 0, 255));
     }
 }
 

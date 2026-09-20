@@ -2,8 +2,7 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 #include <stdio.h>
-
-typedef ma_engine AudioEngine;
+#include "audio.h"
 
 void au_play_sfx(AudioEngine* engine, u8 id) {
     char filename[30];

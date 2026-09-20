@@ -2,26 +2,7 @@
 #include "renderer.h"
 #include "window.h"
 #include "audio.h"
-
-typedef enum {
-    PLAY,   // in a level
-    START,  // start screen
-    SELECT  // level select
-} State;
-
-typedef struct {
-    double s;
-    double window_cooldown;
-} Time;
-
-typedef struct {
-    Renderer renderer;
-    AudioEngine audio;
-    Window window; 
-    State state;
-    Input input;
-    Time time;
-} Game;
+#include "game.h"
 
 void game_init(Game* game) {
     win_init(&game->window, &game->input);
