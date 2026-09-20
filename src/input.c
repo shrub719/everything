@@ -9,3 +9,7 @@ void inp_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+void inp_update() {
+    glfwPollEvents();
+}
+

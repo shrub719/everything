@@ -4,5 +4,6 @@
 int win_init();
 void win_uninit();
 
-void win_loop();
+int win_continue();
+void win_push();
 

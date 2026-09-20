@@ -20,7 +20,6 @@ void frame_buffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, height * RATIO, height);
 }
 
-
 int win_init() {
     glfwSetErrorCallback(error_callback);
 
@@ -55,15 +54,11 @@ void win_uninit() {
 const char* vertex_shader =
 "#version 410 core\n"
 "in vec3 vp;"
-"in vec3 vc;"
 "uniform float time;"
-"out vec3 color;"
 "void main() {"
 "  vec3 p = vp;"
-"  p.y += p.x * sin(time);"
 "  p.x = p.x * cos(time);"
 "  gl_Position = vec4(p, 1.0);"
-"  color = vc;"
 "}";
 
 const char* fragment_shader =
@@ -74,32 +69,7 @@ const char* fragment_shader =
 "  frag_color = vec4(color, 1.0);"
 "}";
 
-void handle_shader_error(GLuint index) {
-    int params = -1;
-    glGetShaderiv(index, GL_COMPILE_STATUS, &params);
-        if (GL_TRUE != params) {
-            int max_length = 2048;
-            int actual_length = 0;
-            char slog[2048];
-            glGetShaderInfoLog(index, max_length, &actual_length, slog);
-            fprintf(stderr, "shader error: shader index %u did not compile\n%s\n", index, slog);
-            // return 1;
-        }
-}
-
-void handle_program_error(GLuint index) {
-    int params = -1;
-    glGetProgramiv(index, GL_LINK_STATUS, &params);
-    if ( GL_TRUE != params ) {    
-        int max_length = 2048;
-        int actual_length = 0;
-        char plog[2048];
-        glGetProgramInfoLog(index, max_length, &actual_length, plog);
-        fprintf( stderr, "shader error: could not link shader index %u\n%s\n", index, plog );
-        // return 1;
-    }
-}
-
+/*
 void win_loop() {
     float points[] = {
         -0.5f, -0.5f, 0.0f,
@@ -162,19 +132,7 @@ void win_loop() {
     char title[256];
 
     while (!glfwWindowShouldClose(window)) {
-        curr_s = glfwGetTime();
-        elapsed_s = curr_s - prev_s;
-        prev_s = curr_s;
-        cooldown_s -= elapsed_s;
-        if (cooldown_s <= 0.0f) {
-            fps = 1.0f / elapsed_s;
-            sprintf(title, "fps: %.2lf", fps);
-            glfwSetWindowTitle(window, title);
-            cooldown_s = 0.1f;
-        }
-
-        glfwPollEvents();       // do drawing and input in separate threads? is that already the case?
-        
+       
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader_program);
@@ -184,5 +142,14 @@ void win_loop() {
 
         glfwSwapBuffers(window);
     }
+}
+*/
+
+int win_continue() {
+    return !glfwWindowShouldClose(window);
+}
+
+void win_push() {
+    glfwSwapBuffers(window);    
 }
 
