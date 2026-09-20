@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(OpenMP REQUIRED)
 
 add_executable(everything_game 
     src/main.c
@@ -14,6 +15,7 @@ add_executable(everything_game
     src/window.c
     src/input.c
     src/renderer.c
+    src/mat.c
 )
 
 target_include_directories(everything_game PRIVATE
@@ -29,6 +31,7 @@ target_link_libraries(everything_game PRIVATE
     dl
     pthread
     m
+    OpenMP::OpenMP_C
 )
 
 add_custom_command(TARGET everything_game POST_BUILD

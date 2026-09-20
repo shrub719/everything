@@ -10,14 +10,14 @@ const u16 HEIGHT = 100;
 void handle_shader_error(GLuint index) {
     int params = -1;
     glGetShaderiv(index, GL_COMPILE_STATUS, &params);
-        if (GL_TRUE != params) {
-            int max_length = 2048;
-            int actual_length = 0;
-            char slog[2048];
-            glGetShaderInfoLog(index, max_length, &actual_length, slog);
-            fprintf(stderr, "shader error: shader index %u did not compile\n%s\n", index, slog);
-            // return 1;
-        }
+    if (GL_TRUE != params) {
+        int max_length = 2048;
+        int actual_length = 0;
+        char slog[2048];
+        glGetShaderInfoLog(index, max_length, &actual_length, slog);
+        fprintf(stderr, "shader error: shader index %u did not compile\n%s\n", index, slog);
+        // return 1;
+    }
 }
 
 void handle_program_error(GLuint index) {
@@ -74,20 +74,22 @@ void r_init_note_renderer() {
     glDeleteShader(fs);
 }
 
+typedef struct {
+    u32 time;
+} Note;
+
+float note_points[] = {
+    1.0, 0.0, 0.0, 1.0,
+    0.0, 1.0, -1.0, 0.0,
+    -1.0, 0.0, 0.0, -1.0,
+    0.0, -1.0, 1.0, 0.0,
+};
+
 void r_draw_notes() {
-    float points[] = {
-        0.2, 0.2,
-        0.2, -0.2,
-        0.2, -0.2,
-        -0.2, -0.2,
-        -0.2, -0.2,
-        -0.2, 0.2,
-        -0.2, 0.2,
-        0.2, 0.2,
-    };
+    Note note = { 1000 };
 
     glBindBuffer(GL_ARRAY_BUFFER, note_renderer.vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(note_points), note_points, GL_STATIC_DRAW);
 
     glBindVertexArray(note_renderer.vao);
     glUseProgram(note_renderer.shader);
