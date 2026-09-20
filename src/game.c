@@ -57,6 +57,8 @@ void game_loop(Game* game) {
     }
     */
 
+    _Atomic bool ready_to_push = false;
+
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -64,6 +66,10 @@ void game_loop(Game* game) {
             while (win_continue(game->window)) {
                 win_poll(game->window);
                 game_parse_input(game);
+                if (ready_to_push) {
+                    win_push(game->window);
+                    ready_to_push = false;
+                }
             }
         }
 
@@ -72,9 +78,11 @@ void game_loop(Game* game) {
             win_init_gl(game->window);
             r_init(&game->renderer);
             while (win_continue(game->window)) {
+                ready_to_push = false;
                 r_update(&game->renderer);
-                win_push(game->window);
                 game_display_fps(game);
+                ready_to_push = true;
+                while (ready_to_push && win_continue(game->window)) {}
             }
         }
     }
