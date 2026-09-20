@@ -1,6 +1,7 @@
 #include <glad/gl.h>
 #include <stdio.h>
 #include <omp.h>
+#include <stdlib.h>
 #include "shaders.h"
 #include "types.h"
 
@@ -33,8 +34,18 @@ void handle_program_error(GLuint index) {
 #define WIDTH 960
 #define HEIGHT 480
 
+typedef u32 Color;
+
+static inline Color rgb_to_color(u8 r, u8 g, u8 b) {
+    Color color = 0xFF;
+    color |= r << 3;
+    color |= g << 2;
+    color |= b << 1;
+    return color;
+}
+
 typedef struct {
-    u32 buffer[WIDTH * HEIGHT];
+    Color buffer[WIDTH * HEIGHT];
     GLuint texture;
     GLuint vao;
     GLuint vbo;
@@ -45,14 +56,59 @@ typedef struct {
 void clear_buffer(Renderer* renderer) {
     #pragma omp parallel for
     for (int i = 0; i < WIDTH * HEIGHT; i++) {
-        renderer->buffer[i] = 0xFF0000FF;
+        // ugh why is anything little endian
+        renderer->buffer[i] = 0x00000000;
+    }
+}
+
+/*
+static inline void debug(int id) {
+    printf("hey %d\n", id);
+    fflush(stdout);
+}
+*/
+
+static inline void set_pixel(Renderer* renderer, int x, int y, Color color) {
+    renderer->buffer[(y * WIDTH + x) % (WIDTH * HEIGHT)] = color;
+}
+
+void draw_line(Renderer* renderer, int x0, int y0, int x1, int y1, Color color) {
+    bool steep = abs(x0-x1) < abs(y0-y1);
+    if (steep) {
+        // should i do fancy xor swap...
+        int temp = x0;
+        x0 = y0;
+        y0 = temp;
+        temp = x1;
+        x1 = y1;
+        y1 = temp;
+    }
+    if (x0 > x1) {
+        int temp = x0;
+        x0 = x1;
+        x1 = temp;
+        temp = y0;
+        y0 = y1;
+        y1 = temp;
+    }
+    int y = y0;
+    int ierror = 0;
+    for (int x = x0; x <= x1; x++) {
+        if (steep) {
+            set_pixel(renderer, y, x, color);
+        } else {
+            set_pixel(renderer, x, y, color);
+        }
+        ierror += 2 * abs(y1-y0);
+        if (ierror > x1 - x0) {
+            y += y1 > y0 ? 1 : -1;
+            ierror -= 2 * (x1 - x0);
+        }
     }
 }
 
 void draw_notes(Renderer* renderer) {
-    for (int x = 0; x < WIDTH; x++) {
-        renderer->buffer[200 * WIDTH + x] = 0xFFFFFFFF;
-    }
+    draw_line(renderer, 0, 0, 960, 480, 0xFFFFFFFF);
 }
 
 void r_init(Renderer* renderer) {
