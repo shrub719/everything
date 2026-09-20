@@ -36,7 +36,7 @@ void handle_program_error(GLuint index) {
 
 typedef u32 Color;
 
-static inline Color rgb_to_color(u8 r, u8 g, u8 b) {
+static inline Color rgb(u8 r, u8 g, u8 b) {
     Color color = 0xFF;
     color |= r << 3;
     color |= g << 2;
@@ -70,6 +70,10 @@ static inline void debug(int id) {
 
 static inline void set_pixel(Renderer* renderer, int x, int y, Color color) {
     renderer->buffer[(y * WIDTH + x) % (WIDTH * HEIGHT)] = color;
+}
+
+static inline double barycentric_area(int x0, int y0, int x1, int y1, int x2, int y2) {
+    return 0.5*((y1-y0)*(x1+x0) + (y2-y1)*(x2+x1) + (y0-y2)*(x0+x2));
 }
 
 void draw_line(Renderer* renderer, int x0, int y0, int x1, int y1, Color color) {
@@ -107,8 +111,37 @@ void draw_line(Renderer* renderer, int x0, int y0, int x1, int y1, Color color) 
     }
 }
 
+static inline int min(int a, int b) {
+    return a < b ? a : b;
+}
+
+static inline int max(int a, int b) {
+    return a > b ? a : b;
+}
+
+void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, int y2, Color color) {
+    int box_x0 = min(min(x0, x1), x2);
+    int box_y0 = min(min(y0, y1), y2);
+    int box_x1 = max(max(x0, x1), x2);
+    int box_y1 = max(max(y0, y1), y2);
+    double area = barycentric_area(x0, y0, x1, y1, x2, y2);
+    if (area < 1.0) return;
+
+    #pragma omp parallel for
+    for (int x = box_x0; x < box_x1; x++) {
+        for (int y = box_y0; y < box_y1; y++) {
+            double alpha = barycentric_area(x, y, x1, y1, x2, y2);
+            double beta = barycentric_area(x, y, x0, y0, x2, y2);
+            double gamma = barycentric_area(x, y, x0, y0, x1, y1);
+            if (alpha < 0 || beta < 0 || gamma < 0) continue;
+            set_pixel(renderer, x, y, color);
+        }
+    }
+}
+
 void draw_notes(Renderer* renderer) {
     draw_line(renderer, 0, 0, 960, 480, 0xFFFFFFFF);
+    draw_triangle(renderer, 50, 50, 100, 100, 100, 200, rgb(255, 0, 0));
 }
 
 void r_init(Renderer* renderer) {
