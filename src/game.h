@@ -9,10 +9,17 @@ typedef enum {
 } State;
 
 typedef struct {
+    double s;
+    double window_cooldown;
+} Time;
+
+typedef struct {
     Renderer renderer;
     AudioEngine audio;
     Window window; 
     State state;
+    Input input;
+    Time time;
 } Game;
 
 
