@@ -13,9 +13,9 @@ add_executable(everything_game
     src/main.c
     src/audio.c
     src/window.c
-    src/input.c
     src/renderer.c
     src/mat.c
+    src/game.c
 )
 
 target_include_directories(everything_game PRIVATE

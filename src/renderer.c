@@ -4,9 +4,6 @@
 #include "shaders.h"
 #include "types.h"
 
-#define WIDTH 960
-#define HEIGHT 480
-
 void handle_shader_error(GLuint index) {
     int params = -1;
     glGetShaderiv(index, GL_COMPILE_STATUS, &params);
@@ -33,6 +30,9 @@ void handle_program_error(GLuint index) {
     }
 }
 
+#define WIDTH 960
+#define HEIGHT 480
+
 typedef struct {
     u32 buffer[WIDTH * HEIGHT];
     GLuint texture;
@@ -42,25 +42,22 @@ typedef struct {
     GLint buffer_uniform;
 } Renderer;
 
-Renderer renderer;
-
-void r_clear() {
-    #pragma omp parallel for collapse(2)
-    for (int y = 0; y < HEIGHT; y++) {
-        for (int x = 0; x < WIDTH; x++) {
-            renderer.buffer[y * WIDTH + x] = 0xFF0000FF;
-        }
-    }
-
+void clear_buffer(Renderer* renderer) {
     #pragma omp parallel for
-    for (int x = 0; x < WIDTH; x++) {
-        renderer.buffer[200 * WIDTH + x] = 0xFFFFFFFF;
+    for (int i = 0; i < WIDTH * HEIGHT; i++) {
+        renderer->buffer[i] = 0xFF0000FF;
     }
 }
 
-void r_init() {
-    glGenTextures(1, &renderer.texture);
-    glBindTexture(GL_TEXTURE_2D, renderer.texture);
+void draw_notes(Renderer* renderer) {
+    for (int x = 0; x < WIDTH; x++) {
+        renderer->buffer[200 * WIDTH + x] = 0xFFFFFFFF;
+    }
+}
+
+void r_init(Renderer* renderer) {
+    glGenTextures(1, &renderer->texture);
+    glBindTexture(GL_TEXTURE_2D, renderer->texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -78,10 +75,10 @@ void r_init() {
         1.0, 1.0,       1.0, 0.0
     };
 
-    glGenVertexArrays(1, &renderer.vao);
-    glGenBuffers(1, &renderer.vbo);
-    glBindVertexArray(renderer.vao);
-    glBindBuffer(GL_ARRAY_BUFFER, renderer.vbo);
+    glGenVertexArrays(1, &renderer->vao);
+    glGenBuffers(1, &renderer->vbo);
+    glBindVertexArray(renderer->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, renderer->vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void *)(0));
@@ -99,40 +96,30 @@ void r_init() {
     glCompileShader(fs);
     handle_shader_error(fs);
 
-    renderer.shader = glCreateProgram();
-    glAttachShader(renderer.shader, vs);
-    glAttachShader(renderer.shader, fs);
-    glLinkProgram(renderer.shader);
-    handle_program_error(renderer.shader);
+    renderer->shader = glCreateProgram();
+    glAttachShader(renderer->shader, vs);
+    glAttachShader(renderer->shader, fs);
+    glLinkProgram(renderer->shader);
+    handle_program_error(renderer->shader);
 
     glDeleteShader(vs);
     glDeleteShader(fs);
 
-    renderer.buffer_uniform = glGetUniformLocation(renderer.shader, "buffer");
+    renderer->buffer_uniform = glGetUniformLocation(renderer->shader, "buffer");
 
-    glUseProgram(renderer.shader);
-    glBindTexture(GL_TEXTURE_2D, renderer.texture);
+    glUseProgram(renderer->shader);
+    glBindTexture(GL_TEXTURE_2D, renderer->texture);
     glActiveTexture(GL_TEXTURE0);
-    glUniform1i(renderer.buffer_uniform, 0);
-    glBindVertexArray(renderer.vao);
+    glUniform1i(renderer->buffer_uniform, 0);
+    glBindVertexArray(renderer->vao);
 }
 
-void r_update() {
-    r_clear();
+void r_update(Renderer* renderer) {
+    clear_buffer(renderer);
+    draw_notes(renderer);
+
     glClear(GL_COLOR_BUFFER_BIT);
-
-    /*
-    glUseProgram(renderer.shader);
-    glBindTexture(GL_TEXTURE_2D, renderer.texture);
-    glActiveTexture(GL_TEXTURE0);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderer.buffer);
-    glUniform1i(renderer.buffer_uniform, 0);
-    glBindVertexArray(renderer.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
-    */
-
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderer.buffer);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderer->buffer);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

@@ -3,32 +3,25 @@
 #include "miniaudio.h"
 #include <stdio.h>
 
-ma_engine au_engine;
+typedef ma_engine AudioEngine;
 
-void au_play_sfx(u8 id) {
+void au_play_sfx(AudioEngine* engine, u8 id) {
     char filename[21];
     sprintf(filename, "assets/sfx_%d.wav", id);
-    ma_engine_play_sound(&au_engine, filename, NULL);
+    ma_engine_play_sound(engine, filename, NULL);
 }
 
-void au_play_track(u8 id) {
+void au_play_track(AudioEngine* engine, u8 id) {
     char filename[21];
     sprintf(filename, "assets/track_%d.wav", id);
-    ma_engine_play_sound(&au_engine, filename, NULL);
+    ma_engine_play_sound(engine, filename, NULL);
 }
 
-int au_init() {
-    ma_result result;
-    result = ma_engine_init(NULL, &au_engine);
-
-    if (result != MA_SUCCESS) {
-        return 1;
-    }
-    
-    return 0;
+void au_init(AudioEngine* engine) {
+    ma_engine_init(NULL, engine);
 }
 
-void au_uninit() {
-    ma_engine_uninit(&au_engine);
+void au_uninit(AudioEngine* engine) {
+    ma_engine_uninit(engine);
 }
 

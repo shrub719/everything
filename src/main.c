@@ -1,30 +1,14 @@
-#include "audio.h"
-#include "window.h"
-#include "renderer.h"
-#include "input.h"
+#include "game.h"
 
 int main(void) {
-    int result;
-    result = win_init();
-    if (result != 0) return result;
-    result = au_init();
-    if (result != 0) {
-        win_uninit();
-        return result;
-    }
-    r_init();
+    Game game;
+    game_init(&game);
 
-    au_play_sfx(0);
-
-    while (win_continue()) {
-        // game_update();   // would hopefully include all of the below
-        inp_update();
-        r_update();
-        win_push();
+    while (game_continue(&game)) {
+        game_update(&game);
     }
 
-    au_uninit();
-    win_uninit();
+    game_uninit(&game);
 
     return 0;
 }
