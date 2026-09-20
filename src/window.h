@@ -10,6 +10,7 @@ typedef GLFWwindow* Window;
 void inp_init(Input* input);
 
 void win_init(Window* window, Input* input);
+void win_init_gl(Window window);
 void win_uninit(Window window);
 
 void win_poll();

@@ -26,7 +26,5 @@ typedef struct {
 
 void game_init(Game* game);
 void game_uninit(Game* game);
-void game_update(Game* game);
-int game_continue(Game* game);
 void game_loop(Game* game);
 

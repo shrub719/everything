@@ -8,7 +8,8 @@
 void game_init(Game* game) {
     win_init(&game->window, &game->input);
     au_init(&game->audio);
-    r_init(&game->renderer);
+    // r_init(&game->renderer);
+    // done in the thread instead
     inp_init(&game->input);
     game->time.s = win_get_time();
     game->time.window_cooldown = 0.1;
@@ -42,6 +43,7 @@ void game_parse_input(Game* game) {
 }
 
 void game_update(Game* game) {
+    win_poll();
     game_parse_input(game);
     r_update(&game->renderer);
     win_push(game->window);
@@ -49,6 +51,12 @@ void game_update(Game* game) {
 }
 
 void game_loop(Game* game) {
+    /*
+    while (win_continue(game->window)) {
+        game_update(game);
+    }
+    */
+
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -56,18 +64,19 @@ void game_loop(Game* game) {
             while (win_continue(game->window)) {
                 win_poll(game->window);
                 game_parse_input(game);
-                game_display_fps(game);
             }
         }
 
         #pragma omp section
         {
+            win_init_gl(game->window);
+            r_init(&game->renderer);
             while (win_continue(game->window)) {
                 r_update(&game->renderer);
                 win_push(game->window);
+                game_display_fps(game);
             }
         }
     }
-    printf("%d\n", win_continue(game->window));
 }
 

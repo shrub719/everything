@@ -49,14 +49,16 @@ void win_init(Window* window_ptr, Input* input) {
 
     Window window = glfwCreateWindow(INIT_WIDTH, INIT_HEIGHT, "EVERYTHING", NULL, NULL);
     *window_ptr = window;
-
-    glfwMakeContextCurrent(window);
-    gladLoadGL(glfwGetProcAddress);
-
-    glfwSwapInterval(0);    // vsync?
+    
     glfwSetWindowUserPointer(window, input);
     glfwSetKeyCallback(window, inp_callback);
     glfwSetFramebufferSizeCallback(window, frame_buffer_size_callback);
+}
+
+void win_init_gl(Window window) {
+    glfwMakeContextCurrent(window);
+    gladLoadGL(glfwGetProcAddress);
+    glfwSwapInterval(0);    // vsync?
 }
 
 void win_uninit(Window window) {
