@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "types.h"
 #include "audio.h"
 
@@ -27,7 +28,11 @@ typedef struct {
 void input_callback(Window window, int key, int scancode, int action, int mods) {
     Input* input = glfwGetWindowUserPointer(window);
     if (key >= 0 && key <= GLFW_KEY_LAST) {
-        input->keys[key] = (action == GLFW_PRESS);
+        if (action == GLFW_PRESS) {
+            input->keys[key] = true;
+        } else if (action == GLFW_RELEASE) {
+            input->keys[key] = false;
+        }
     }
 }
 
