@@ -60,13 +60,6 @@ void clear_buffer(Renderer* renderer) {
     }
 }
 
-/*
-void debug(int id) {
-    printf("hey %d\n", id);
-    fflush(stdout);
-}
-*/
-
 void set_pixel(Renderer* renderer, int x, int y, Color color) {
     renderer->buffer[(y * WIDTH + x) % (WIDTH * HEIGHT)] = color;
 }

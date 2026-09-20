@@ -6,13 +6,13 @@
 typedef ma_engine AudioEngine;
 
 void au_play_sfx(AudioEngine* engine, u8 id) {
-    char filename[21];
+    char filename[30];
     sprintf(filename, "assets/sfx_%d.wav", id);
     ma_engine_play_sound(engine, filename, NULL);
 }
 
 void au_play_track(AudioEngine* engine, u8 id) {
-    char filename[21];
+    char filename[30];
     sprintf(filename, "assets/track_%d.wav", id);
     ma_engine_play_sound(engine, filename, NULL);
 }

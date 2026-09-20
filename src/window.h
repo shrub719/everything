@@ -11,8 +11,7 @@ void win_uninit(Window window);
 
 int win_continue(Window window);
 void win_push(Window window);
-
-void inp_update(Window window, Input* input, AudioEngine* audio);
+void win_close(Window window);
 
 double win_get_time();
 

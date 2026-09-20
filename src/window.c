@@ -25,19 +25,9 @@ typedef struct {
 } Input;
 
 void input_callback(Window window, int key, int scancode, int action, int mods) {
-    Input* input = (Input *)(glfwGetWindowUserPointer(window));
+    Input* input = glfwGetWindowUserPointer(window);
     if (key >= 0 && key <= GLFW_KEY_LAST) {
         input->keys[key] = (action == GLFW_PRESS);
-    }
-}
-
-void inp_update(Window window, Input* input, AudioEngine* audio) {
-    glfwPollEvents();
-
-    if (input->keys[GLFW_KEY_ESCAPE]) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    } else if (input->keys[GLFW_KEY_ENTER]) {
-        au_play_sfx(audio, 0);
     }
 }
 
@@ -67,12 +57,18 @@ void win_uninit(Window window) {
     glfwDestroyWindow(window);
     glfwTerminate();
 }
+
 int win_continue(Window window) {
+    glfwPollEvents();
     return !glfwWindowShouldClose(window);
 }
 
 void win_push(Window window) {
     glfwSwapBuffers(window);    
+}
+
+void win_close(Window window) {
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
 double win_get_time() {
