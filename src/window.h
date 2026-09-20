@@ -14,3 +14,5 @@ void win_push(Window window);
 
 void inp_update(Window window, Input* input, AudioEngine* audio);
 
+double win_get_time();
+

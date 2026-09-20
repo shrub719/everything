@@ -75,3 +75,7 @@ void win_push(Window window) {
     glfwSwapBuffers(window);    
 }
 
+double win_get_time() {
+    return glfwGetTime();
+}
+
