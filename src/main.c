@@ -8,7 +8,10 @@ int main(void) {
     result = win_init();
     if (result != 0) return result;
     result = au_init();
-    if (result != 0) return result;
+    if (result != 0) {
+        win_uninit();
+        return result;
+    }
 
     au_play_sfx(0);
     r_init_note_renderer();

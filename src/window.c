@@ -8,7 +8,7 @@
 
 const u16 INIT_HEIGHT = 480;
 const u16 INIT_WIDTH = 960;
-const float RATIO = INIT_WIDTH/INIT_HEIGHT;
+const float RATIO = (float)INIT_WIDTH / (float)INIT_HEIGHT;
 
 GLFWwindow* window;
 

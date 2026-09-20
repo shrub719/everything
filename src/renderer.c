@@ -51,6 +51,7 @@ void r_init_note_renderer() {
     glBindVertexArray(note_renderer.vao);
     glBindBuffer(GL_ARRAY_BUFFER, note_renderer.vbo);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
     
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &note_vert, NULL);
@@ -85,7 +86,7 @@ void r_draw_notes() {
     glUseProgram(note_renderer.shader);
     glBindBuffer(GL_ARRAY_BUFFER, note_renderer.vbo);
     glBindVertexArray(note_renderer.vao);
-    glBufferData(GL_ARRAY_BUFFER, 16*sizeof(float), points, GL_STATIC_DRAW);
-    glDrawArrays(GL_LINES, 0, 2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    glDrawArrays(GL_LINES, 0, 8);
 }
 
