@@ -20,7 +20,7 @@ void frame_buffer_size_callback(Window window, int width, int height) {
     glViewport(0, 0, height * RATIO, height);
 }
 
-void input_callback(Window window, int key, int scancode, int action, int mods) {
+void inp_callback(Window window, int key, int scancode, int action, int mods) {
     Input* input = glfwGetWindowUserPointer(window);
     if (key >= 0 && key <= GLFW_KEY_LAST) {
         if (action == GLFW_PRESS) {
@@ -28,6 +28,12 @@ void input_callback(Window window, int key, int scancode, int action, int mods) 
         } else if (action == GLFW_RELEASE) {
             input->keys[key] = false;
         }
+    }
+}
+
+void inp_init(Input* input) {
+    for (int key = 0; key <= GLFW_KEY_LAST; key++) {
+        input->keys[key] = false;
     }
 }
 
@@ -49,7 +55,7 @@ void win_init(Window* window_ptr, Input* input) {
 
     glfwSwapInterval(0);    // vsync?
     glfwSetWindowUserPointer(window, input);
-    glfwSetKeyCallback(window, input_callback);
+    glfwSetKeyCallback(window, inp_callback);
     glfwSetFramebufferSizeCallback(window, frame_buffer_size_callback);
 }
 
@@ -58,8 +64,11 @@ void win_uninit(Window window) {
     glfwTerminate();
 }
 
-int win_continue(Window window) {
+void win_poll() {
     glfwPollEvents();
+}
+
+int win_continue(Window window) {
     return !glfwWindowShouldClose(window);
 }
 

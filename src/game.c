@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <omp.h>
 #include "renderer.h"
 #include "window.h"
 #include "audio.h"
@@ -8,9 +9,10 @@ void game_init(Game* game) {
     win_init(&game->window, &game->input);
     au_init(&game->audio);
     r_init(&game->renderer);
-    au_play_sfx(&game->audio, 0);
+    inp_init(&game->input);
     game->time.s = win_get_time();
     game->time.window_cooldown = 0.1;
+    au_play_sfx(&game->audio, 0);
 }
 
 void game_uninit(Game* game) {
@@ -46,7 +48,26 @@ void game_update(Game* game) {
     game_display_fps(game);
 }
 
-int game_continue(Game* game) {
-    return win_continue(game->window);
+void game_loop(Game* game) {
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        {
+            while (win_continue(game->window)) {
+                win_poll(game->window);
+                game_parse_input(game);
+                game_display_fps(game);
+            }
+        }
+
+        #pragma omp section
+        {
+            while (win_continue(game->window)) {
+                r_update(&game->renderer);
+                win_push(game->window);
+            }
+        }
+    }
+    printf("%d\n", win_continue(game->window));
 }
 

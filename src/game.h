@@ -10,12 +10,13 @@ typedef enum {
 
 typedef struct {
     double s;
+    double track_ms;
     double window_cooldown;
 } Time;
 
 typedef struct {
     Renderer renderer;
-    AudioEngine audio;
+    Audio audio;
     Window window; 
     State state;
     Input input;
@@ -27,4 +28,5 @@ void game_init(Game* game);
 void game_uninit(Game* game);
 void game_update(Game* game);
 int game_continue(Game* game);
+void game_loop(Game* game);
 

@@ -7,9 +7,12 @@ typedef struct {
 } Input;
 typedef GLFWwindow* Window;
 
+void inp_init(Input* input);
+
 void win_init(Window* window, Input* input);
 void win_uninit(Window window);
 
+void win_poll();
 int win_continue(Window window);
 void win_push(Window window);
 void win_close(Window window);

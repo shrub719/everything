@@ -4,9 +4,7 @@ int main(void) {
     Game game;
     game_init(&game);
 
-    while (game_continue(&game)) {
-        game_update(&game);
-    }
+    game_loop(&game);
 
     game_uninit(&game);
 
