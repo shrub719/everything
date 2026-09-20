@@ -54,7 +54,6 @@ typedef struct {
 } Renderer;
 
 void clear_buffer(Renderer* renderer) {
-    #pragma omp parallel for
     for (int i = 0; i < WIDTH * HEIGHT; i++) {
         // ugh why is anything little endian
         renderer->buffer[i] = 0x00000000;
@@ -127,7 +126,6 @@ void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, i
     double area = barycentric_area(x0, y0, x1, y1, x2, y2);
     if (area < 2.0) return;
 
-    #pragma omp parallel for
     for (int x = box_x0; x < box_x1; x++) {
         for (int y = box_y0; y < box_y1; y++) {
             double alpha = barycentric_area(x, y, x1, y1, x2, y2);
@@ -142,8 +140,8 @@ void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, i
 void draw_notes(Renderer* renderer) {
     draw_line(renderer, 0, 0, 960, 480, 0xFFFFFFFF);
     
-    for (int i = 0; i < 5000; i++) {
-        draw_triangle(renderer, 10, 20, 10, 100, 100, 100, rgb(255, 0, 255));
+    for (int i = 0; i < 10000; i++) {
+        draw_triangle(renderer, 0, 0, 0, 10, 10, 10, rgb(255, 0, 255));
     }
 }
 
