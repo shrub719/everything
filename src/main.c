@@ -12,15 +12,14 @@ int main(void) {
         win_uninit();
         return result;
     }
+    r_init();
 
     au_play_sfx(0);
-    r_init_note_renderer();
 
     while (win_continue()) {
         // game_update();   // would hopefully include all of the below
         inp_update();
-        r_clear();
-        r_draw_notes();
+        r_update();
         win_push();
     }
 

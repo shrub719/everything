@@ -1,5 +1,3 @@
-void r_clear();
-
-void r_init_note_renderer();
-void r_draw_notes();
+void r_init();
+void r_update();
 
