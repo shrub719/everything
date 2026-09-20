@@ -50,13 +50,7 @@ void game_display_fps(Game* game) {
     }
 }
 
-void debug(int id) {
-    printf("hey %d\n", id);
-    fflush(stdout);
-}
-
 void game_parse_input(Game* game) {
-    debug(game->input.keys[GLFW_KEY_ESCAPE]);
     if (game->input.keys[GLFW_KEY_ESCAPE]) {
         win_close(game->window);
     } else if (game->input.keys[GLFW_KEY_ENTER]) {

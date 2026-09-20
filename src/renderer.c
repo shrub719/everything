@@ -37,10 +37,10 @@ void handle_program_error(GLuint index) {
 typedef u32 Color;
 
 Color rgb(u8 r, u8 g, u8 b) {
-    Color color = 0xFF000000;
-    color |= r << 3;
-    color |= g << 2;
-    color |= b << 1;
+    Color color = 0x000000FF;
+    color |= r << 16;
+    color |= g << 8;
+    color |= b << 0;
     return color;
 }
 
