@@ -150,9 +150,23 @@ void draw_note(Renderer* renderer, int ms_until, bool top_lane) {
 }
 
 void draw_bg(Renderer* renderer) {
-    draw_line(renderer, 0, VERTICAL_PADDING, WIDTH, VERTICAL_PADDING, WHITE);
-    draw_line(renderer, 0, HEIGHT-VERTICAL_PADDING, WIDTH, HEIGHT-VERTICAL_PADDING, WHITE);
-    draw_line(renderer, HORIZONTAL_PADDING, 0, HORIZONTAL_PADDING, HEIGHT, WHITE);
+    draw_line(renderer, 0, 100, 1920, 100, WHITE);
+    draw_line(renderer, 0, 380, 1920, 380, WHITE);
+    draw_line(renderer, 200, 100, 200, 380, WHITE);
+
+    draw_triangle(renderer, 200, 60, 200, 140, 240, 100, BLACK);
+    draw_triangle(renderer, 200, 60, 160, 100, 200, 140, BLACK);
+    draw_line(renderer, 200, 60, 240, 100, WHITE);
+    draw_line(renderer, 240, 100, 200, 140, WHITE);
+    draw_line(renderer, 200, 140, 160, 100, WHITE);
+    draw_line(renderer, 160, 100, 200, 60, WHITE);
+
+    draw_triangle(renderer, 200, 340, 200, 420, 240, 380, BLACK);
+    draw_triangle(renderer, 200, 340, 160, 380, 200, 420, BLACK);
+    draw_line(renderer, 200, 340, 240, 380, WHITE);
+    draw_line(renderer, 240, 380, 200, 420, WHITE);
+    draw_line(renderer, 200, 420, 160, 380, WHITE);
+    draw_line(renderer, 160, 380, 200, 340, WHITE);
 }
 
 void draw_lane(Renderer* renderer, Note* seek, int ms, bool top_lane) {
