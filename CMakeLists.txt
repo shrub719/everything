@@ -14,7 +14,6 @@ add_executable(everything_game
     src/audio.c
     src/window.c
     src/renderer.c
-    src/mat.c
     src/game.c
 )
 

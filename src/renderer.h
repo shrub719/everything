@@ -18,12 +18,9 @@
 typedef u32 Color;
 
 typedef struct {
-    u32 buffer[WIDTH * HEIGHT];
-    GLuint texture;
     GLuint vao;
     GLuint vbo;
     GLuint shader;
-    GLint buffer_uniform;
     atomic_int* window_height_ptr;
 } Renderer;
 
