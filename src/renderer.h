@@ -3,8 +3,10 @@
 #include "types.h"
 #include <glad/gl.h>
 
-#define WIDTH 960
+#define INIT_WIDTH 960
+#define WIDTH INIT_WIDTH*2
 #define HEIGHT 480
+static const float RATIO = (float)WIDTH / (float)HEIGHT;
 
 typedef u32 Color;
 

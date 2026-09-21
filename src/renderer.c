@@ -33,10 +33,6 @@ void handle_program_error(GLuint index) {
     }
 }
 
-#define WIDTH 960
-#define HEIGHT 480
-static const float RATIO = (float)WIDTH / (float)HEIGHT;
-
 Color rgb(u8 r, u8 g, u8 b) {
     Color color = 0xFF000000;
     color |= r << 16;
@@ -126,8 +122,8 @@ void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, i
 }
 
 void draw_notes(Renderer* renderer) {
-    draw_line(renderer, 0, 100, 960, 100, WHITE);
-    draw_line(renderer, 0, 380, 960, 380, WHITE);
+    draw_line(renderer, 0, 100, WIDTH, 100, WHITE);
+    draw_line(renderer, 0, 380, WIDTH, 380, WHITE);
 
     for (int i = 0; i < 50; i++) {
         draw_triangle(renderer,
@@ -215,7 +211,7 @@ void r_update(Renderer* renderer) {
 
     glClear(GL_COLOR_BUFFER_BIT);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderer->buffer);
-    glViewport(0, 0, height * RATIO, height);
+    glViewport(0, 0, (float)height * RATIO, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

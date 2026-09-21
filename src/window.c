@@ -7,11 +7,8 @@
 #include <stdbool.h>
 #include "types.h"
 #include "audio.h"
+#include "renderer.h"
 #include "window.h"
-
-const u16 HEIGHT = 480;
-const u16 WIDTH = 960;
-const float RATIO = (float)WIDTH / (float)HEIGHT;
 
 void error_callback(int error, const char* description) {
     fprintf(stderr, "glfw error: code %i\n%s\n", error, description);
@@ -59,7 +56,7 @@ void win_init(Window* window_ptr, Input* input) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    Window window = glfwCreateWindow(WIDTH, HEIGHT, "EVERYTHING", NULL, NULL);
+    Window window = glfwCreateWindow(INIT_WIDTH, HEIGHT, "EVERYTHING", NULL, NULL);
     *window_ptr = window;
 
     glfwSetWindowUserPointer(window, input);
