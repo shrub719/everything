@@ -11,7 +11,7 @@ typedef enum {
 
 typedef struct {
     double s;
-    double track_ms;
+    int track_ms;
     double window_cooldown;
 } Time;
 

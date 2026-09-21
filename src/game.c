@@ -17,6 +17,7 @@ void game_init(Game* game) {
     game->renderer.window_height_ptr = &game->input.window_height;
     game->state = PLAY;
     au_play_sfx(&game->audio, 0);
+    au_play_track(&game->audio, 0);
 }
 
 void game_uninit(Game* game) {
@@ -46,21 +47,7 @@ void game_parse_input(Game* game) {
     }
 }
 
-void game_update(Game* game) {
-    win_poll();
-    game_parse_input(game);
-    r_update(&game->renderer);
-    win_push(game->window);
-    game_display_fps(game);
-}
-
 void game_loop(Game* game) {
-    /*
-    while (win_continue(game->window)) {
-        game_update(game);
-    }
-    */
-
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -68,6 +55,8 @@ void game_loop(Game* game) {
             while (win_continue(game->window)) {
                 win_poll(game->window);
                 game_parse_input(game);
+                game->time.track_ms = au_get_track_ms(&game->audio);
+                printf("%d\n", game->time.track_ms);
             }
         }
 

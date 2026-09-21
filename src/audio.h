@@ -9,6 +9,7 @@ typedef struct {
 
 void au_play_sfx(Audio* audio, u8 id);
 void au_play_track(Audio* audio, u8 id);
+int au_get_track_ms(Audio* audio);
 
 void au_init(Audio* audio);
 void au_uninit(Audio* audio);
