@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <omp.h>
 #include <stdatomic.h>
 #include "renderer.h"
@@ -15,9 +16,6 @@ void game_init(Game* game) {
     game->time.s = win_get_time();
     game->time.window_cooldown = 0.1;
     game->renderer.window_height_ptr = &game->input.window_height;
-    game->state = PLAY;
-    au_play_sfx(&game->audio, 0);
-    au_play_track(&game->audio, 0);
 }
 
 void game_uninit(Game* game) {
@@ -47,7 +45,24 @@ void game_parse_input(Game* game) {
     }
 }
 
+void game_init_track(Game* game) {
+    game->state = PLAY;
+    au_play_sfx(&game->audio, 0);
+    au_play_track(&game->audio, 0);
+
+    game->track.top = malloc(20 * sizeof(Note));
+    game->track.bottom = malloc(20 * sizeof(Note));
+    game->track.top_seek = game->track.top;
+    game->track.bottom_seek = game->track.bottom;
+    for (int i = 0; i < 20; i++) {
+        game->track.top[i].ms = 500 * i;
+        game->track.bottom[i].ms = 250 + 500 * i;
+    }
+}
+
 void game_loop(Game* game) {
+    game_init_track(game);
+
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -56,7 +71,7 @@ void game_loop(Game* game) {
                 win_poll(game->window);
                 game_parse_input(game);
                 game->time.track_ms = au_get_track_ms(&game->audio);
-                printf("%d\n", game->time.track_ms);
+                game->track.ms = game->time.track_ms;
             }
         }
 
@@ -65,7 +80,7 @@ void game_loop(Game* game) {
             win_init_gl(game->window);
             r_init(&game->renderer);
             while (win_continue(game->window)) {
-                r_update(&game->renderer);
+                r_draw(&game->renderer, game->track);
                 win_push(game->window);
                 game_display_fps(game);
             }

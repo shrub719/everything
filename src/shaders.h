@@ -1,4 +1,4 @@
-static const char* game_vert = 
+const char* game_vert = 
     "#version 410 core\n"
     "in vec2 pos;"
     "in vec2 tex_coord;"
@@ -8,7 +8,7 @@ static const char* game_vert =
     "   uv = tex_coord;"
     "}";
 
-static const char* game_frag =
+const char* game_frag =
     "#version 410 core\n"
     "in vec2 uv;"
     "out vec4 color;"

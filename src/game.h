@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include "window.h"
 #include "audio.h"
+#include "track.h"
 
 typedef enum {
     PLAY,   // in a level
@@ -22,6 +23,7 @@ typedef struct {
     State state;
     Input input;
     Time time;
+    Track track;
 } Game;
 
 void game_init(Game* game);

@@ -1,11 +1,13 @@
 #include <glad/gl.h>
 #include <stdatomic.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <omp.h>
 #include <stdlib.h>
 #include "shaders.h"
 #include "types.h"
 #include "renderer.h"
+#include "track.h"
 
 void handle_shader_error(GLuint index) {
     int params = -1;
@@ -121,28 +123,64 @@ void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, i
     }
 }
 
-void draw_notes(Renderer* renderer) {
-    draw_line(renderer, 0, 100, WIDTH, 100, WHITE);
-    draw_line(renderer, 0, 380, WIDTH, 380, WHITE);
+void draw_note(Renderer* renderer, int ms_until, bool top_lane) {
+    int x = HORIZONTAL_PADDING + ms_until * PIXELS_PER_MS;
+    int y = top_lane ? VERTICAL_PADDING : HEIGHT-VERTICAL_PADDING;
+    int x0 = x - NOTE_SIZE;
+    int x1 = x + NOTE_SIZE;
+    int y0 = y - NOTE_SIZE;
+    int y1 = y + NOTE_SIZE;
+    fflush(stdout);
 
-    for (int i = 0; i < 50; i++) {
-        draw_triangle(renderer,
-            50, 50,
-            50, 150,
-            150, 150,
+    draw_triangle(renderer,
+            x0, y0,
+            x0, y1,
+            x1, y1,
             BLACK
-        );
-        draw_triangle(renderer,
-            50, 50,
-            150, 150,
-            150, 50,
-            BLACK
-        );
-        draw_line(renderer, 50, 50, 50, 150, WHITE);
-        draw_line(renderer, 50, 150, 150, 150, WHITE);
-        draw_line(renderer, 150, 150, 150, 50, WHITE);
-        draw_line(renderer, 150, 50, 50, 50, WHITE);
+    );
+    draw_triangle(renderer,
+        x0, y0,
+        x1, y1,
+        x1, y0,
+        BLACK
+    );
+    draw_line(renderer, x0, y0, x0, y1, WHITE);
+    draw_line(renderer, x0, y1, x1, y1, WHITE);
+    draw_line(renderer, x1, y1, x1, y0, WHITE);
+    draw_line(renderer, x1, y0, x0, y0, WHITE);
+}
+
+void draw_bg(Renderer* renderer) {
+    draw_line(renderer, 0, VERTICAL_PADDING, WIDTH, VERTICAL_PADDING, WHITE);
+    draw_line(renderer, 0, HEIGHT-VERTICAL_PADDING, WIDTH, HEIGHT-VERTICAL_PADDING, WHITE);
+    draw_line(renderer, HORIZONTAL_PADDING, 0, HORIZONTAL_PADDING, HEIGHT, WHITE);
+}
+
+void draw_lane(Renderer* renderer, Note* seek, int ms, bool top_lane) {
+    bool too_far = false; 
+    // prevent crash when no notes left?
+    for (int i = 0; !too_far; i++) {
+        int ms_until = seek[i].ms - ms;
+        if (ms_until > FORWARD_TRACK_WIDTH * PIXELS_PER_MS) {
+            too_far = true;
+            continue;
+        }
+
+        draw_note(renderer, ms_until, top_lane);
     }
+}
+
+void r_draw(Renderer* renderer, Track track) {
+    int height = atomic_load(renderer->window_height_ptr);
+    clear_buffer(renderer);
+    draw_bg(renderer);
+    draw_lane(renderer, track.top_seek, track.ms, true);
+    draw_lane(renderer, track.bottom_seek, track.ms, false);
+
+    glClear(GL_COLOR_BUFFER_BIT);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderer->buffer);
+    glViewport(0, 0, (float)height * RATIO, height);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void r_init(Renderer* renderer) {
@@ -202,16 +240,5 @@ void r_init(Renderer* renderer) {
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(renderer->buffer_uniform, 0);
     glBindVertexArray(renderer->vao);
-}
-
-void r_update(Renderer* renderer) {
-    int height = atomic_load(renderer->window_height_ptr);
-    clear_buffer(renderer);
-    draw_notes(renderer);
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderer->buffer);
-    glViewport(0, 0, (float)height * RATIO, height);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
