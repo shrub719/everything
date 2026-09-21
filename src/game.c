@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <omp.h>
-#include <stdatomic.h>
 #include "renderer.h"
 #include "window.h"
 #include "audio.h"
@@ -35,10 +34,11 @@ void game_display_fps(Game* game) {
     }
 }
 
-void game_parse_input(Game* game) {
-    if (game->input.keys[GLFW_KEY_ESCAPE]) {
+void game_parse_input(Game* game) {     
+    inp_update(&game->input);
+    if (game->input.hit[GLFW_KEY_ESCAPE]) {
         win_close(game->window);
-    } else if (game->input.keys[GLFW_KEY_ENTER]) {
+    } else if (game->input.hit[GLFW_KEY_ENTER]) {
         au_play_sfx(&game->audio, 0);
     }
 }
@@ -58,8 +58,6 @@ void game_loop(Game* game) {
     }
     */
 
-    atomic_bool ready_to_push = false;
-
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -67,10 +65,6 @@ void game_loop(Game* game) {
             while (win_continue(game->window)) {
                 win_poll(game->window);
                 game_parse_input(game);
-                if (atomic_load(&ready_to_push)) {
-                    win_push(game->window);
-                    atomic_store(&ready_to_push, false);
-                }
             }
         }
 
@@ -80,9 +74,8 @@ void game_loop(Game* game) {
             r_init(&game->renderer);
             while (win_continue(game->window)) {
                 r_update(&game->renderer);
+                win_push(game->window);
                 game_display_fps(game);
-                atomic_store(&ready_to_push, true);
-                while (atomic_load(&ready_to_push) && win_continue(game->window)) {}
             }
         }
     }

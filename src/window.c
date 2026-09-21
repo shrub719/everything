@@ -24,16 +24,25 @@ void inp_callback(Window window, int key, int scancode, int action, int mods) {
     Input* input = glfwGetWindowUserPointer(window);
     if (key >= 0 && key <= GLFW_KEY_LAST) {
         if (action == GLFW_PRESS) {
-            input->keys[key] = true;
+            input->pressed[key] = true;
         } else if (action == GLFW_RELEASE) {
-            input->keys[key] = false;
+            input->pressed[key] = false;
         }
     }
 }
 
 void inp_init(Input* input) {
     for (int key = 0; key <= GLFW_KEY_LAST; key++) {
-        input->keys[key] = false;
+        input->pressed[key] = false;
+        input->prev_pressed[key] = false;
+        input->hit[key] = false;
+    }
+}
+
+void inp_update(Input* input) {
+    for (int key = 0; key <= GLFW_KEY_LAST; key++) {
+        input->hit[key] = input->pressed[key] && !(input->prev_pressed[key]);
+        input->prev_pressed[key] = input->pressed[key];
     }
 }
 

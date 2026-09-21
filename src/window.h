@@ -3,11 +3,14 @@
 #include "audio.h"
 
 typedef struct {
-    bool keys[GLFW_KEY_LAST + 1];
+    bool pressed[GLFW_KEY_LAST + 1];
+    bool prev_pressed[GLFW_KEY_LAST + 1];
+    bool hit[GLFW_KEY_LAST + 1];
 } Input;
 typedef GLFWwindow* Window;
 
 void inp_init(Input* input);
+void inp_update(Input* input);
 
 void win_init(Window* window, Input* input);
 void win_init_gl(Window window);
