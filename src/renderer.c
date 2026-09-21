@@ -130,7 +130,6 @@ void draw_note(Renderer* renderer, int ms_until, bool top_lane) {
     int x1 = x + NOTE_SIZE;
     int y0 = y - NOTE_SIZE;
     int y1 = y + NOTE_SIZE;
-    fflush(stdout);
 
     draw_triangle(renderer,
             x0, y0,

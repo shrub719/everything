@@ -60,6 +60,11 @@ void game_init_track(Game* game) {
     }
 }
 
+void game_uninit_track(Game* game) {
+    free(game->track.top);
+    free(game->track.bottom);
+}
+
 void game_loop(Game* game) {
     game_init_track(game);
 
@@ -86,5 +91,7 @@ void game_loop(Game* game) {
             }
         }
     }
+
+    game_uninit_track(game);
 }
 
