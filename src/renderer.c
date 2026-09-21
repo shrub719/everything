@@ -38,12 +38,15 @@ void handle_program_error(GLuint index) {
 static const float RATIO = (float)WIDTH / (float)HEIGHT;
 
 Color rgb(u8 r, u8 g, u8 b) {
-    Color color = 0x000000FF;
+    Color color = 0xFF000000;
     color |= r << 16;
     color |= g << 8;
     color |= b << 0;
     return color;
 }
+
+#define WHITE rgb(255, 255, 255)
+#define BLACK rgb(0, 0, 0)
 
 void clear_buffer(Renderer* renderer) {
     for (int i = 0; i < WIDTH * HEIGHT; i++) {
@@ -56,7 +59,7 @@ void set_pixel(Renderer* renderer, int x, int y, Color color) {
     renderer->buffer[(y * WIDTH + x) % (WIDTH * HEIGHT)] = color;
 }
 
-double barycentric_area(int x0, int y0, int x1, int y1, int x2, int y2) {
+int barycentric_area(int x0, int y0, int x1, int y1, int x2, int y2) {
     return -((x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0));
 }
 
@@ -108,14 +111,14 @@ void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, i
     int box_y0 = min(min(y0, y1), y2);
     int box_x1 = max(max(x0, x1), x2);
     int box_y1 = max(max(y0, y1), y2);
-    double area = barycentric_area(x0, y0, x1, y1, x2, y2);
-    if (area < 2.0) return;
+    int area = barycentric_area(x0, y0, x1, y1, x2, y2);
+    if (area < 2) return;
 
-    for (int x = box_x0; x < box_x1; x++) {
-        for (int y = box_y0; y < box_y1; y++) {
-            double alpha = barycentric_area(x, y, x1, y1, x2, y2);
-            double beta = barycentric_area(x, y, x0, y0, x2, y2);
-            double gamma = barycentric_area(x, y, x0, y0, x1, y1);
+    for (int x = box_x0; x <= box_x1; x++) {
+        for (int y = box_y0; y <= box_y1; y++) {
+            int alpha = barycentric_area(x, y, x1, y1, x2, y2);
+            int beta = barycentric_area(x, y, x2, y2, x0, y0);
+            int gamma = barycentric_area(x, y, x0, y0, x1, y1);
             if (alpha < 0 || beta < 0 || gamma < 0) continue;
             set_pixel(renderer, x, y, color);
         }
@@ -123,13 +126,27 @@ void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, i
 }
 
 void draw_notes(Renderer* renderer) {
-    draw_line(renderer, 0, 240, 960, 240, 0xFFFFFFFF);
-    
-    /*
-    for (int i = 0; i < 5; i++) {
-        draw_triangle(renderer, 0, 0, 0, 480, 960, 480, rgb(255, 0, 255));
+    draw_line(renderer, 0, 100, 960, 100, WHITE);
+    draw_line(renderer, 0, 380, 960, 380, WHITE);
+
+    for (int i = 0; i < 50; i++) {
+        draw_triangle(renderer,
+            50, 50,
+            50, 150,
+            150, 150,
+            BLACK
+        );
+        draw_triangle(renderer,
+            50, 50,
+            150, 150,
+            150, 50,
+            BLACK
+        );
+        draw_line(renderer, 50, 50, 50, 150, WHITE);
+        draw_line(renderer, 50, 150, 150, 150, WHITE);
+        draw_line(renderer, 150, 150, 150, 50, WHITE);
+        draw_line(renderer, 150, 50, 50, 50, WHITE);
     }
-    */
 }
 
 void r_init(Renderer* renderer) {
