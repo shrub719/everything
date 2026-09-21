@@ -54,7 +54,9 @@ void clear_buffer(Renderer* renderer) {
 }
 
 void set_pixel(Renderer* renderer, int x, int y, Color color) {
-    renderer->buffer[(y * WIDTH + x) % (WIDTH * HEIGHT)] = color;
+    if (y >= HEIGHT) return;
+    if (x >= WIDTH) return;
+    renderer->buffer[y * WIDTH + x] = color;
 }
 
 int barycentric_area(int x0, int y0, int x1, int y1, int x2, int y2) {
