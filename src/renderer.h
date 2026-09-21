@@ -1,4 +1,5 @@
 #pragma once
+#include <stdatomic.h>
 #include "types.h"
 #include <glad/gl.h>
 
@@ -14,6 +15,7 @@ typedef struct {
     GLuint vbo;
     GLuint shader;
     GLint buffer_uniform;
+    atomic_int* window_height_ptr;
 } Renderer;
 
 void r_init(Renderer* renderer);

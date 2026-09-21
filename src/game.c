@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <omp.h>
+#include <stdatomic.h>
 #include "renderer.h"
 #include "window.h"
 #include "audio.h"
@@ -13,6 +14,7 @@ void game_init(Game* game) {
     inp_init(&game->input);
     game->time.s = win_get_time();
     game->time.window_cooldown = 0.1;
+    game->renderer.window_height_ptr = &game->input.window_height;
     au_play_sfx(&game->audio, 0);
 }
 

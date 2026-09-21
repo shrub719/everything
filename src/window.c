@@ -2,22 +2,24 @@
 #include <glad/gl.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include "types.h"
 #include "audio.h"
 #include "window.h"
 
-const u16 INIT_HEIGHT = 480;
-const u16 INIT_WIDTH = 960;
-const float RATIO = (float)INIT_WIDTH / (float)INIT_HEIGHT;
+const u16 HEIGHT = 480;
+const u16 WIDTH = 960;
+const float RATIO = (float)WIDTH / (float)HEIGHT;
 
 void error_callback(int error, const char* description) {
     fprintf(stderr, "glfw error: code %i\n%s\n", error, description);
 }
 
 void frame_buffer_size_callback(Window window, int width, int height) {
-    glViewport(0, 0, height * RATIO, height);
+    Input* input = glfwGetWindowUserPointer(window);
+    atomic_store(&input->window_height, height);
 }
 
 void inp_callback(Window window, int key, int scancode, int action, int mods) {
@@ -37,6 +39,7 @@ void inp_init(Input* input) {
         input->prev_pressed[key] = false;
         input->hit[key] = false;
     }
+    input->window_height = HEIGHT;
 }
 
 void inp_update(Input* input) {
@@ -50,15 +53,15 @@ void win_init(Window* window_ptr, Input* input) {
     glfwSetErrorCallback(error_callback);
 
     glfwInit();
-    
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    Window window = glfwCreateWindow(INIT_WIDTH, INIT_HEIGHT, "EVERYTHING", NULL, NULL);
+    Window window = glfwCreateWindow(WIDTH, HEIGHT, "EVERYTHING", NULL, NULL);
     *window_ptr = window;
-    
+
     glfwSetWindowUserPointer(window, input);
     glfwSetKeyCallback(window, inp_callback);
     glfwSetFramebufferSizeCallback(window, frame_buffer_size_callback);

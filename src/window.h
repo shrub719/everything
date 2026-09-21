@@ -1,11 +1,13 @@
 #pragma once
 #include <GLFW/glfw3.h>
+#include <stdatomic.h>
 #include "audio.h"
 
 typedef struct {
     bool pressed[GLFW_KEY_LAST + 1];
     bool prev_pressed[GLFW_KEY_LAST + 1];
     bool hit[GLFW_KEY_LAST + 1];
+    atomic_int window_height;
 } Input;
 typedef GLFWwindow* Window;
 

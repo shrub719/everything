@@ -1,4 +1,5 @@
 #include <glad/gl.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <omp.h>
 #include <stdlib.h>
@@ -34,6 +35,7 @@ void handle_program_error(GLuint index) {
 
 #define WIDTH 960
 #define HEIGHT 480
+static const float RATIO = (float)WIDTH / (float)HEIGHT;
 
 Color rgb(u8 r, u8 g, u8 b) {
     Color color = 0x000000FF;
@@ -121,11 +123,13 @@ void draw_triangle(Renderer* renderer, int x0, int y0, int x1, int y1, int x2, i
 }
 
 void draw_notes(Renderer* renderer) {
-    draw_line(renderer, 0, 0, 960, 480, 0xFFFFFFFF);
+    draw_line(renderer, 0, 240, 960, 240, 0xFFFFFFFF);
     
+    /*
     for (int i = 0; i < 5; i++) {
         draw_triangle(renderer, 0, 0, 0, 480, 960, 480, rgb(255, 0, 255));
     }
+    */
 }
 
 void r_init(Renderer* renderer) {
@@ -188,11 +192,13 @@ void r_init(Renderer* renderer) {
 }
 
 void r_update(Renderer* renderer) {
+    int height = atomic_load(renderer->window_height_ptr);
     clear_buffer(renderer);
     draw_notes(renderer);
 
     glClear(GL_COLOR_BUFFER_BIT);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderer->buffer);
+    glViewport(0, 0, height * RATIO, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

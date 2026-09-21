@@ -1,3 +1,4 @@
+#pragma once
 #include "renderer.h"
 #include "window.h"
 #include "audio.h"
@@ -22,7 +23,6 @@ typedef struct {
     Input input;
     Time time;
 } Game;
-
 
 void game_init(Game* game);
 void game_uninit(Game* game);
