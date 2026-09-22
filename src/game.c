@@ -36,7 +36,7 @@ void game_display_fps(Game* game) {
     }
 }
 
-void game_parse_input(Game* game) {     
+void game_handle_input(Game* game) {     
     inp_update(&game->input);
     if (game->input.hit[GLFW_KEY_ESCAPE]) {
         win_close(game->window);
@@ -90,7 +90,7 @@ void game_loop(Game* game) {
         {
             while (win_continue(game->window)) {
                 win_poll(game->window);
-                game_parse_input(game);
+                game_handle_input(game);
                 game_update_ms(game);
             }
         }
