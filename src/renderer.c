@@ -241,7 +241,7 @@ void r_populate_r_notes(Renderer* renderer, ATrack* track) {
     for (int i = 0; i < MAX_RNOTES; i++) {
         int note_ms = seek[i].ms;
         int ms_until = note_ms - ms;
-        if (ms_until > FORWARD_TRACK_WIDTH * PIXELS_PER_MS) break;
+        if (ms_until > (FORWARD_TRACK_WIDTH) * MS_PER_PIXEL) break;
         
         int x = HORIZONTAL_PADDING + ms_until * PIXELS_PER_MS;
         int lane = seek[i].lane;
