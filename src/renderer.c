@@ -121,7 +121,7 @@ void r_init_note(InstancedRenderer* note) {
     // vbo for instance attributes
     glGenBuffers(1, &note->instance_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, note->instance_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(RNote), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4*sizeof(RNote), NULL, GL_DYNAMIC_DRAW);
 
     // instance angle
     glEnableVertexAttribArray(1);
@@ -178,6 +178,7 @@ void r_init(Renderer* renderer) {
 
 void r_draw(Renderer* renderer) {
     static const RNote r_notes[] = {
+        { 0.2, 100.0, 100.0 },
         { 0.5, 100.0, 100.0 },
         { 0.0, 150.0, 120.0 },
         { 1.0, 200.0, 150.0 }
@@ -189,11 +190,11 @@ void r_draw(Renderer* renderer) {
     glViewport(0, 0, (float)height * RATIO, height);
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer->note.instance_vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 3*sizeof(RNote), r_notes);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 4*sizeof(RNote), r_notes);
 
     glUseProgram(renderer->note.shader);
     glBindVertexArray(renderer->note.vao);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 3);   // 3 = 3 INSTANCES!!
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 4);   // 3 = 3 INSTANCES!!
     glBindVertexArray(0);
 }
 
