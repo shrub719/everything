@@ -10,18 +10,19 @@ typedef enum {
 
 typedef struct {
     int ms;
-    Lane lane;
 } Note;
 
 // ATrack is the atomic information intended to be passed to the renderer thread
 // seek is the earliest note that should still be processed
 typedef struct {
-    _Atomic(Note*) seek;
+    _Atomic(Note*) seek_top;
+    _Atomic(Note*) seek_bottom;
     atomic_int ms;
 } ATrack;
 
 typedef struct {
-    Note* notes;
+    Note* top;
+    Note* bottom;
     int ms_start;
     ATrack a;
 } Track;

@@ -226,9 +226,32 @@ void r_uninit(Renderer* renderer) {
     free(renderer->r_notes);
 }
 
+void r_populate_lane(Renderer* renderer, int ms, Note* seek, Lane lane) {
+    for (int i = 0; i < MAX_RNOTES/4; i++) {
+        int note_ms = seek[i].ms;
+        int ms_until = note_ms - ms;
+        if (ms_until > (FORWARD_TRACK_WIDTH) * MS_PER_PIXEL) break;
+
+        int x = HORIZONTAL_PADDING + ms_until * PIXELS_PER_MS;
+
+        // outline
+        renderer->r_notes[renderer->n_notes].angle = 0.785 - 0.002 * ms_until;
+        renderer->r_notes[renderer->n_notes].x = x;
+        renderer->r_notes[renderer->n_notes].y = 100.0 + 280.0 * (lane == BOTTOM);
+
+        // note
+        renderer->r_notes[renderer->n_notes + 1].angle = 0.785 - 0.001 * ms_until;
+        renderer->r_notes[renderer->n_notes + 1].x = x;
+        renderer->r_notes[renderer->n_notes + 1].y = 100.0 + 280.0 * (lane == BOTTOM);
+
+        renderer->n_notes += 2;
+    }
+}
+
 void r_populate_r_notes(Renderer* renderer, ATrack* track) {
-    Note* seek = atomic_load(&track->seek);
     int ms = atomic_load(&track->ms);
+    Note* seek_top = atomic_load(&track->seek_top);
+    Note* seek_bottom = atomic_load(&track->seek_bottom);
 
     renderer->r_notes[0].angle = 0.785;
     renderer->r_notes[0].x = HORIZONTAL_PADDING;
@@ -238,26 +261,8 @@ void r_populate_r_notes(Renderer* renderer, ATrack* track) {
     renderer->r_notes[1].y = 380.0;
     renderer->n_notes = 2;
 
-    for (int i = 0; i < MAX_RNOTES; i++) {
-        int note_ms = seek[i].ms;
-        int ms_until = note_ms - ms;
-        if (ms_until > (FORWARD_TRACK_WIDTH) * MS_PER_PIXEL) break;
-        
-        int x = HORIZONTAL_PADDING + ms_until * PIXELS_PER_MS;
-        int lane = seek[i].lane;
-
-        // outline
-        renderer->r_notes[2 + 2*i]. angle = 0.785 - 0.002 * ms_until;
-        renderer->r_notes[2 + 2*i].x = x;
-        renderer->r_notes[2 + 2*i].y = 100.0 + 280.0 * (lane == BOTTOM);
-
-        // note
-        renderer->r_notes[2 + 2*i + 1].angle = 0.785 - 0.001 * ms_until;
-        renderer->r_notes[2 + 2*i + 1].x = x;
-        renderer->r_notes[2 + 2*i + 1].y = 100.0 + 280.0 * (lane == BOTTOM);
-
-        renderer->n_notes += 2;
-    }
+    r_populate_lane(renderer, ms, seek_top, TOP);
+    r_populate_lane(renderer, ms, seek_bottom, BOTTOM);
 }
 
 void r_draw(Renderer* renderer) {

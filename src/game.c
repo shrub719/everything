@@ -40,10 +40,14 @@ void game_parse_input(Game* game) {
     inp_update(&game->input);
     if (game->input.hit[GLFW_KEY_ESCAPE]) {
         win_close(game->window);
-    } else if (game->input.hit[GLFW_KEY_ENTER]) {
+    }
+    if (game->input.hit[GLFW_KEY_I]) {
         au_play_sfx(&game->audio, 0);
-        // temp!!
-        Note* seek = atomic_fetch_add(&game->track.a.seek, sizeof(Note));
+        atomic_fetch_add(&game->track.a.seek_top, sizeof(Note));
+    }
+    if (game->input.hit[GLFW_KEY_J]) {
+        au_play_sfx(&game->audio, 0);
+        atomic_fetch_add(&game->track.a.seek_bottom, sizeof(Note));
     }
 }
 
@@ -53,18 +57,19 @@ void game_init_track(Game* game) {
     au_play_track(&game->audio, 0);
     game->track.ms_start = win_get_ms();
 
-    game->track.notes = malloc(40 * sizeof(Note));
-    atomic_init(&game->track.a.seek, game->track.notes);
+    game->track.top = malloc(20 * sizeof(Note));
+    game->track.bottom = malloc(20 * sizeof(Note));
+    atomic_init(&game->track.a.seek_top, game->track.top);
+    atomic_init(&game->track.a.seek_bottom, game->track.bottom);
     for (int i = 0; i < 20; i++) {
-        game->track.notes[2*i].ms = 1000 + 1000 * i;
-        game->track.notes[2*i].lane = TOP;
-        game->track.notes[2*i + 1].ms = 1500 + 1000 * i;
-        game->track.notes[2*i + 1].lane = BOTTOM;
+        game->track.top[i].ms = 1000 + 1000 * i;
+        game->track.bottom[i].ms = 1500 + 1000 * i;
     }
 }
 
 void game_uninit_track(Game* game) {
-    free(game->track.notes);
+    free(game->track.top);
+    free(game->track.bottom);
 }
 
 void game_update_ms(Game* game) {
