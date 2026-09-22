@@ -1,4 +1,4 @@
-const char* game_vert = 
+const char* note_vert = 
     "#version 410 core\n"
     "in vec2 a_pos;"
     "in float a_angle;"
@@ -22,7 +22,7 @@ const char* game_vert =
     "   gl_Position = vec4(coords, 0.0, 1.0);"
     "}";
 
-const char* game_frag =
+const char* note_frag =
     "#version 410 core\n"
     "in vec2 v_pos;"
     "out vec4 color;"

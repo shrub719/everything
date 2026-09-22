@@ -22,6 +22,18 @@ typedef struct {
     GLuint vbo;
     GLuint instance_vbo;
     GLuint shader;
+} InstancedRenderer;
+
+typedef struct {
+    GLuint vao;
+    GLuint vbo;
+    GLuint shader;
+} GenericRenderer;
+
+typedef struct {
+    InstancedRenderer note;
+    InstancedRenderer trace;
+    GenericRenderer track;
     atomic_int* window_height_ptr;
 } Renderer;
 

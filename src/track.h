@@ -18,3 +18,10 @@ typedef struct {
     float y;
 } RNote;
 
+typedef struct {
+    float angle;
+    float x;
+    float y;
+    float decay;
+} RTrace;
+

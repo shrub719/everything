@@ -96,7 +96,7 @@ void draw_lane(Renderer* renderer, Note* seek, int ms, bool top_lane) {
 }
 */
 
-void r_init(Renderer* renderer) {
+void r_init_note(InstancedRenderer* note) {
     static const float note_vertices[] = {
         -1.0, -1.0,
         1.0, -1.0,
@@ -108,19 +108,19 @@ void r_init(Renderer* renderer) {
     };
 
     // vao
-    glGenVertexArrays(1, &renderer->vao);
-    glBindVertexArray(renderer->vao);
+    glGenVertexArrays(1, &note->vao);
+    glBindVertexArray(note->vao);
 
     // vbo for vertices
-    glGenBuffers(1, &renderer->vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, renderer->vbo);
+    glGenBuffers(1, &note->vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, note->vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(note_vertices), note_vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
 
     // vbo for instance attributes
-    glGenBuffers(1, &renderer->instance_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, renderer->instance_vbo);
+    glGenBuffers(1, &note->instance_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, note->instance_vbo);
     glBufferData(GL_ARRAY_BUFFER, 3*sizeof(RNote), NULL, GL_DYNAMIC_DRAW);
 
     // instance angle
@@ -139,31 +139,41 @@ void r_init(Renderer* renderer) {
     glVertexAttribDivisor(3, 1);
 
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &game_vert, NULL);
+    glShaderSource(vs, 1, &note_vert, NULL);
     glCompileShader(vs);
     handle_shader_error(vs);
 
     GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &game_frag, NULL);
+    glShaderSource(fs, 1, &note_frag, NULL);
     glCompileShader(fs);
     handle_shader_error(fs);
 
-    renderer->shader = glCreateProgram();
-    glAttachShader(renderer->shader, vs);
-    glAttachShader(renderer->shader, fs);
-    glLinkProgram(renderer->shader);
-    handle_program_error(renderer->shader);
+    note->shader = glCreateProgram();
+    glAttachShader(note->shader, vs);
+    glAttachShader(note->shader, fs);
+    glLinkProgram(note->shader);
+    handle_program_error(note->shader);
 
     glDeleteShader(vs);
     glDeleteShader(fs);
 
-    glUseProgram(renderer->shader);
-    GLint screen_size_uniform = glGetUniformLocation(renderer->shader, "u_screen_size");
+    glUseProgram(note->shader);
+    GLint screen_size_uniform = glGetUniformLocation(note->shader, "u_screen_size");
     glUniform2f(screen_size_uniform, (float)WIDTH, (float)HEIGHT);
-    GLint size_uniform = glGetUniformLocation(renderer->shader, "u_size");
+    GLint size_uniform = glGetUniformLocation(note->shader, "u_size");
     glUniform1f(size_uniform, (float)NOTE_SIZE);
 
     glBindVertexArray(0);
+}
+
+void r_init_trace(InstancedRenderer* trace) {
+    return;
+}
+
+void r_init(Renderer* renderer) {
+    glLineWidth(4.0);
+    r_init_note(&renderer->note);
+    r_init_trace(&renderer->trace);
 }
 
 void r_draw(Renderer* renderer) {
@@ -178,11 +188,11 @@ void r_draw(Renderer* renderer) {
     glClear(GL_COLOR_BUFFER_BIT);
     glViewport(0, 0, (float)height * RATIO, height);
 
-    glBindBuffer(GL_ARRAY_BUFFER, renderer->instance_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, renderer->note.instance_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 3*sizeof(RNote), r_notes);
 
-    glUseProgram(renderer->shader);
-    glBindVertexArray(renderer->vao);
+    glUseProgram(renderer->note.shader);
+    glBindVertexArray(renderer->note.vao);
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 3);   // 3 = 3 INSTANCES!!
     glBindVertexArray(0);
 }
