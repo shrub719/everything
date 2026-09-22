@@ -15,7 +15,7 @@ const char* game_vert =
     "   vec2 px = rotation * a_pos + vec2(a_x, a_y);"
     "   vec2 coords;"
     "   coords.x = (px.x / u_screen_size.x) * 2.0 - 1.0;"
-    "   coords.y = (px.y / u_screen_size.y) * 2.0 - 1.0;"
+    "   coords.y = 1.0 - (px.y / u_screen_size.y) * 2.0;"
     "   gl_Position = vec4(coords, 0.0, 1.0);"
     "}";
 

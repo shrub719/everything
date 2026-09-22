@@ -19,7 +19,6 @@ void handle_shader_error(GLuint index) {
         char slog[2048];
         glGetShaderInfoLog(index, max_length, &actual_length, slog);
         fprintf(stderr, "shader error: shader index %u did not compile\n%s\n", index, slog);
-        // return 1;
     }
 }
 
@@ -32,20 +31,8 @@ void handle_program_error(GLuint index) {
         char plog[2048];
         glGetProgramInfoLog(index, max_length, &actual_length, plog);
         fprintf( stderr, "shader error: could not link shader index %u\n%s\n", index, plog );
-        // return 1;
     }
 }
-
-Color rgb(u8 r, u8 g, u8 b) {
-    Color color = 0xFF000000;
-    color |= r << 16;
-    color |= g << 8;
-    color |= b << 0;
-    return color;
-}
-
-#define WHITE rgb(255, 255, 255)
-#define BLACK rgb(0, 0, 0)
 
 /*
 void draw_note(Renderer* renderer, int ms_until, bool top_lane) {
@@ -134,7 +121,7 @@ void r_init(Renderer* renderer) {
     // vbo for instance attributes
     glGenBuffers(1, &renderer->instance_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, renderer->instance_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 256*sizeof(Note), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(RNote), NULL, GL_DYNAMIC_DRAW);
 
     // instance angle
     glEnableVertexAttribArray(1);
@@ -190,7 +177,7 @@ void r_draw(Renderer* renderer, Track track) {
     glViewport(0, 0, (float)height * RATIO, height);
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer->instance_vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 256*sizeof(RNote), r_notes);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 3*sizeof(RNote), r_notes);
 
     glUseProgram(renderer->shader);
     glBindVertexArray(renderer->vao);
