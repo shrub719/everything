@@ -42,6 +42,8 @@ void game_parse_input(Game* game) {
         win_close(game->window);
     } else if (game->input.hit[GLFW_KEY_ENTER]) {
         au_play_sfx(&game->audio, 0);
+        // temp!!
+        Note* seek = atomic_fetch_add(&game->track.a.seek, sizeof(Note));
     }
 }
 
@@ -72,7 +74,6 @@ void game_update_ms(Game* game) {
     int ms = win_ms;
     // int ms = win_ms > au_ms;
     atomic_store(&game->track.a.ms, ms);
-    printf("game: %d\n", ms);
 }
 
 void game_loop(Game* game) {

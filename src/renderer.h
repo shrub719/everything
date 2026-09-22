@@ -8,8 +8,8 @@
 #define WIDTH INIT_WIDTH*2
 #define HEIGHT 480
 #define RATIO (float)WIDTH / (float)HEIGHT
-#define MS_PER_PIXEL 2
-#define PIXELS_PER_MS 1.0/(float)MS_PER_PIXEL
+#define MS_PER_PIXEL 1.5
+#define PIXELS_PER_MS 1.0/MS_PER_PIXEL
 #define NOTE_SIZE 40
 #define VERTICAL_PADDING 100
 #define HORIZONTAL_PADDING 200

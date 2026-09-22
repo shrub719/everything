@@ -229,16 +229,20 @@ void r_uninit(Renderer* renderer) {
 void r_populate_r_notes(Renderer* renderer, ATrack* track) {
     Note* seek = atomic_load(&track->seek);
     int ms = atomic_load(&track->ms);
-    printf("renderer: %d\n", ms);
-    fflush(stdout);
 
-    renderer->r_notes[0].angle = 0.785;
-    renderer->r_notes[0].x = 200.0;
-    renderer->r_notes[0].y = 100.0;
-    renderer->r_notes[1].angle = 0.785;
-    renderer->r_notes[1].x = 200.0;
-    renderer->r_notes[1].y = 380.0;
-    renderer->n_notes = 2;
+    for (int i = 0; i < 5; i++) {
+        int note_ms = seek[i].ms;
+        int ms_until = note_ms - ms;
+        if (ms_until > FORWARD_TRACK_WIDTH * PIXELS_PER_MS) break;
+        
+        int x = HORIZONTAL_PADDING + ms_until * PIXELS_PER_MS;
+        int lane = seek[i].lane;
+
+        renderer->r_notes[i].angle = 0.785 + 0.2 * i;
+        renderer->r_notes[i].x = x;
+        renderer->r_notes[i].y = 100.0 + 280.0 * (lane == BOTTOM);
+    }
+    renderer->n_notes = 5;
 }
 
 void r_draw(Renderer* renderer) {
