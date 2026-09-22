@@ -23,5 +23,6 @@ int win_continue(Window window);
 void win_push(Window window);
 void win_close(Window window);
 
-double win_get_time();
+double win_get_s();
+int win_get_ms();
 

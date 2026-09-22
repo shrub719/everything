@@ -22,6 +22,7 @@ typedef struct {
 
 typedef struct {
     Note* notes;
+    int ms_start;
     ATrack a;
 } Track;
 

@@ -13,7 +13,7 @@ void game_init(Game* game) {
     // r_init(&game->renderer);
     // done in the thread instead
     inp_init(&game->input);
-    game->time.s = win_get_time();
+    game->time.s = win_get_s();
     game->time.window_cooldown = 0.1;
     game->renderer.window_height_ptr = &game->input.window_height;
 }
@@ -24,7 +24,7 @@ void game_uninit(Game* game) {
 }
 
 void game_display_fps(Game* game) {
-    double curr_s = win_get_time();
+    double curr_s = win_get_s();
     double elapsed_s = curr_s - game->time.s;
     game->time.s = curr_s;
     game->time.window_cooldown -= elapsed_s;
@@ -49,6 +49,7 @@ void game_init_track(Game* game) {
     game->state = PLAY;
     au_play_sfx(&game->audio, 0);
     au_play_track(&game->audio, 0);
+    game->track.ms_start = win_get_ms();
 
     game->track.notes = malloc(40 * sizeof(Note));
     atomic_init(&game->track.a.seek, game->track.notes);
@@ -64,6 +65,16 @@ void game_uninit_track(Game* game) {
     free(game->track.notes);
 }
 
+void game_update_ms(Game* game) {
+    // how would i interpolate between the two?
+    // int au_ms = au_get_track_ms(&game->audio);
+    int win_ms = win_get_ms() - game->track.ms_start;
+    int ms = win_ms;
+    // int ms = win_ms > au_ms;
+    atomic_store(&game->track.a.ms, ms);
+    printf("game: %d\n", ms);
+}
+
 void game_loop(Game* game) {
     game_init_track(game);
 
@@ -74,9 +85,7 @@ void game_loop(Game* game) {
             while (win_continue(game->window)) {
                 win_poll(game->window);
                 game_parse_input(game);
-                atomic_store(&game->track.a.ms, au_get_track_ms(&game->audio));
-                printf("game: %d\n", au_get_track_ms(&game->audio));
-                fflush(stdout);
+                game_update_ms(game);
             }
         }
 

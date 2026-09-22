@@ -17,13 +17,11 @@ void au_play_track(Audio* audio, u8 id) {
     ma_sound_start(&audio->track);
 }
 
-// looks like this isn't actually accurate enough
 int au_get_track_ms(Audio* audio) {
     ma_uint64 cursor;
     ma_sound_get_cursor_in_pcm_frames(&audio->track, &cursor);
 
     ma_uint32 sample_rate = ma_engine_get_sample_rate(&audio->engine);
-    printf("sample rate: %d\n", sample_rate);
 
     return (int)((double)cursor * 1000.0 / (double)sample_rate);
 }

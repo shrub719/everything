@@ -91,7 +91,12 @@ void win_close(Window window) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-double win_get_time() {
+double win_get_s() {
     return glfwGetTime();
+}
+
+int win_get_ms() {
+    double s = glfwGetTime();
+    return (int)(s * 1000.0);
 }
 
