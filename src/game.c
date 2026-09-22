@@ -75,8 +75,7 @@ void game_loop(Game* game) {
             while (win_continue(game->window)) {
                 win_poll(game->window);
                 game_parse_input(game);
-                game->time.track_ms = au_get_track_ms(&game->audio);
-                game->track.ms = game->time.track_ms;
+                game->track.ms = au_get_track_ms(&game->audio);
             }
         }
 
