@@ -5,6 +5,8 @@ const char* game_vert =
     "in float a_x;"
     "in float a_y;"
     "uniform vec2 u_screen_size;"
+    "uniform float u_size;"
+    "out vec2 v_pos;"
     "void main() {"
     "   float c = cos(a_angle);"
     "   float s = sin(a_angle);"
@@ -12,7 +14,8 @@ const char* game_vert =
     "       c, -s,"
     "       s, c"
     "   );"
-    "   vec2 px = rotation * a_pos + vec2(a_x, a_y);"
+    "   v_pos = a_pos;"
+    "   vec2 px = rotation * (u_size * a_pos) + vec2(a_x, a_y);"
     "   vec2 coords;"
     "   coords.x = (px.x / u_screen_size.x) * 2.0 - 1.0;"
     "   coords.y = 1.0 - (px.y / u_screen_size.y) * 2.0;"
@@ -21,8 +24,14 @@ const char* game_vert =
 
 const char* game_frag =
     "#version 410 core\n"
+    "in vec2 v_pos;"
     "out vec4 color;"
     "void main() {"
-    "   color = vec4(1.0);"
+    "   float border = 0.05;"
+    "   if (abs(v_pos.x) > 1.0 - border || abs(v_pos.y) > 1.0 - border) {"
+    "       color = vec4(1.0);"
+    "   } else {"
+    "       color = vec4(0.0, 0.0, 0.0, 1.0);"
+    "   }"
     "}";
 

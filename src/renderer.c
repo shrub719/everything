@@ -98,13 +98,13 @@ void draw_lane(Renderer* renderer, Note* seek, int ms, bool top_lane) {
 
 void r_init(Renderer* renderer) {
     static const float note_vertices[] = {
-        -40.0, -40.0,
-        40.0, -40.0,
-        40.0, 40.0,
+        -1.0, -1.0,
+        1.0, -1.0,
+        1.0, 1.0,
 
-        -40.0, -40.0,
-        40.0, 40.0,
-        -40.0, 40.0
+        -1.0, -1.0,
+        1.0, 1.0,
+        -1.0, 1.0
     };
 
     // vao
@@ -160,6 +160,8 @@ void r_init(Renderer* renderer) {
     glUseProgram(renderer->shader);
     GLint screen_size_uniform = glGetUniformLocation(renderer->shader, "u_screen_size");
     glUniform2f(screen_size_uniform, (float)WIDTH, (float)HEIGHT);
+    GLint size_uniform = glGetUniformLocation(renderer->shader, "u_size");
+    glUniform1f(size_uniform, (float)NOTE_SIZE);
 
     glBindVertexArray(0);
 }
