@@ -2,6 +2,7 @@
 #include <stdatomic.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <omp.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -121,7 +122,7 @@ void r_init_note(InstancedRenderer* note) {
     // vbo for instance attributes
     glGenBuffers(1, &note->instance_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, note->instance_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 256*sizeof(RNote), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, MAX_RNOTES*sizeof(RNote), NULL, GL_DYNAMIC_DRAW);
 
     // instance angle
     glEnableVertexAttribArray(1);
@@ -216,9 +217,32 @@ void r_init(Renderer* renderer) {
     // glLineWidth(8.0);
     r_init_note(&renderer->note);
     r_init_track(&renderer->track);
+    renderer->r_notes = malloc(MAX_RNOTES * sizeof(RNote));
+    renderer->n_notes = 0;
+}
+
+// this is NOT how it should work for realz
+void r_uninit(Renderer* renderer) {
+    free(renderer->r_notes);
+}
+
+void r_populate_r_notes(Renderer* renderer, ATrack* track) {
+    Note* seek = atomic_load(&track->seek);
+    int ms = atomic_load(&track->ms);
+    printf("renderer: %d\n", ms);
+    fflush(stdout);
+
+    renderer->r_notes[0].angle = 0.785;
+    renderer->r_notes[0].x = 200.0;
+    renderer->r_notes[0].y = 100.0;
+    renderer->r_notes[1].angle = 0.785;
+    renderer->r_notes[1].x = 200.0;
+    renderer->r_notes[1].y = 380.0;
+    renderer->n_notes = 2;
 }
 
 void r_draw(Renderer* renderer) {
+    /*
     static const RNote r_notes[] = {
         { 0.785, 200.0, 100.0 },
         { 0.785, 200.0, 380.0 },
@@ -227,6 +251,7 @@ void r_draw(Renderer* renderer) {
         { 0.0, 150.0, 120.0 },
         { 1.0, 200.0, 150.0 }
     };
+    */
     
     int height = atomic_load(renderer->window_height_ptr);
 
@@ -234,7 +259,7 @@ void r_draw(Renderer* renderer) {
     glViewport(0, 0, (float)height * RATIO, height);
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer->note.instance_vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 6*sizeof(RNote), r_notes);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, renderer->n_notes*sizeof(RNote), renderer->r_notes);
 
     glUseProgram(renderer->track.shader);
     glBindVertexArray(renderer->track.vao);
@@ -243,11 +268,12 @@ void r_draw(Renderer* renderer) {
 
     glUseProgram(renderer->note.shader);
     glBindVertexArray(renderer->note.vao);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 6);   // last number is number of instances
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderer->n_notes);   // last number is number of instances
     glBindVertexArray(0);
 }
 
-void r_update(Renderer* renderer, Track track) {
+void r_update(Renderer* renderer, ATrack* track) {
+    r_populate_r_notes(renderer, track);
     r_draw(renderer);
 }
 

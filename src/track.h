@@ -1,17 +1,28 @@
 #pragma once
 #include <stdatomic.h>
 
+typedef enum {
+    TOP,
+    BOTTOM,
+    SHADOW_TOP,
+    SHADOW_BOTTOM
+} Lane;
+
 typedef struct {
     int ms;
+    Lane lane;
 } Note;
 
+// ATrack is the atomic information intended to be passed to the renderer thread
 // seek is the earliest note that should still be processed
 typedef struct {
-    Note* top;
-    Note* bottom;
-    _Atomic(Note*) top_seek;
-    _Atomic(Note*) bottom_seek;
-    int ms;
+    _Atomic(Note*) seek;
+    atomic_int ms;
+} ATrack;
+
+typedef struct {
+    Note* notes;
+    ATrack a;
 } Track;
 
 // produced by renderer deciding which notes to draw

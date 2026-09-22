@@ -15,6 +15,8 @@
 #define HORIZONTAL_PADDING 200
 #define FORWARD_TRACK_WIDTH WIDTH + 2 * NOTE_SIZE - HORIZONTAL_PADDING
 
+#define MAX_RNOTES 256
+
 typedef u32 Color;
 
 typedef struct {
@@ -34,8 +36,11 @@ typedef struct {
     InstancedRenderer note;
     GenericRenderer track;
     atomic_int* window_height_ptr;
+    RNote* r_notes;
+    int n_notes;
 } Renderer;
 
 void r_init(Renderer* renderer);
-void r_update(Renderer* renderer, Track track);
+void r_uninit(Renderer* renderer);
+void r_update(Renderer* renderer, ATrack* track);
 

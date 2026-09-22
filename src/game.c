@@ -50,19 +50,18 @@ void game_init_track(Game* game) {
     au_play_sfx(&game->audio, 0);
     au_play_track(&game->audio, 0);
 
-    game->track.top = malloc(20 * sizeof(Note));
-    game->track.bottom = malloc(20 * sizeof(Note));
-    game->track.top_seek = game->track.top;
-    game->track.bottom_seek = game->track.bottom;
+    game->track.notes = malloc(40 * sizeof(Note));
+    atomic_init(&game->track.a.seek, game->track.notes);
     for (int i = 0; i < 20; i++) {
-        game->track.top[i].ms = 500 * i;
-        game->track.bottom[i].ms = 250 + 500 * i;
+        game->track.notes[2*i].ms = 1000 + 1000 * i;
+        game->track.notes[2*i].lane = TOP;
+        game->track.notes[2*i + 1].ms = 1500 + 1000 * i;
+        game->track.notes[2*i + 1].lane = BOTTOM;
     }
 }
 
 void game_uninit_track(Game* game) {
-    free(game->track.top);
-    free(game->track.bottom);
+    free(game->track.notes);
 }
 
 void game_loop(Game* game) {
@@ -75,7 +74,9 @@ void game_loop(Game* game) {
             while (win_continue(game->window)) {
                 win_poll(game->window);
                 game_parse_input(game);
-                game->track.ms = au_get_track_ms(&game->audio);
+                atomic_store(&game->track.a.ms, au_get_track_ms(&game->audio));
+                printf("game: %d\n", au_get_track_ms(&game->audio));
+                fflush(stdout);
             }
         }
 
@@ -83,11 +84,12 @@ void game_loop(Game* game) {
         {
             win_init_gl(game->window);
             r_init(&game->renderer);
-            while (win_continue(game->window)) {
-                r_update(&game->renderer, game->track);
+            while (win_continue(game->window)) {    // this is race condition
+                r_update(&game->renderer, &game->track.a);
                 win_push(game->window);
                 game_display_fps(game);
             }
+            r_uninit(&game->renderer);
         }
     }
 
