@@ -32,11 +32,10 @@ typedef struct {
 
 typedef struct {
     InstancedRenderer note;
-    InstancedRenderer trace;
     GenericRenderer track;
     atomic_int* window_height_ptr;
 } Renderer;
 
 void r_init(Renderer* renderer);
-void r_draw(Renderer* renderer);
+void r_update(Renderer* renderer, Track track);
 

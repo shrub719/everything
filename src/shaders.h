@@ -35,3 +35,20 @@ const char* note_frag =
     "   }"
     "}";
 
+const char* track_vert = 
+    "#version 410 core\n"
+    "in vec2 a_px;"
+    "uniform vec2 u_screen_size;"
+    "void main() {"
+    "   vec2 coords;"
+    "   coords.x = (a_px.x / u_screen_size.x) * 2.0 - 1.0;"
+    "   coords.y = (a_px.y / u_screen_size.y) * 2.0 - 1.0;"
+    "   gl_Position = vec4(coords, -1.0, 1.0);"
+    "}";
+
+const char* track_frag = 
+    "#version 410 core\n"
+    "out vec4 color;"
+    "void main() {"
+    "   color = vec4(1.0);"
+    "}";
