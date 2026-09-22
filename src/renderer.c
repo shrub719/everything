@@ -164,7 +164,7 @@ void r_init(Renderer* renderer) {
     glBindVertexArray(0);
 }
 
-void r_draw(Renderer* renderer, Track track) {
+void r_draw(Renderer* renderer) {
     static const RNote r_notes[] = {
         { 0.5, 100.0, 100.0 },
         { 0.0, 150.0, 120.0 },

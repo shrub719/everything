@@ -26,5 +26,5 @@ typedef struct {
 } Renderer;
 
 void r_init(Renderer* renderer);
-void r_draw(Renderer* renderer, Track track);
+void r_draw(Renderer* renderer);
 

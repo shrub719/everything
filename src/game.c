@@ -84,7 +84,7 @@ void game_loop(Game* game) {
             win_init_gl(game->window);
             r_init(&game->renderer);
             while (win_continue(game->window)) {
-                r_draw(&game->renderer, game->track);
+                r_draw(&game->renderer);
                 win_push(game->window);
                 game_display_fps(game);
             }
