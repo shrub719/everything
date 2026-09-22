@@ -20,6 +20,7 @@ typedef u32 Color;
 typedef struct {
     GLuint vao;
     GLuint vbo;
+    GLuint instance_vbo;
     GLuint shader;
     atomic_int* window_height_ptr;
 } Renderer;

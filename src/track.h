@@ -12,3 +12,9 @@ typedef struct {
     int ms;
 } Track;
 
+typedef struct {
+    float angle;
+    float x;
+    float y;
+} RNote;
+

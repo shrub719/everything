@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <omp.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "shaders.h"
 #include "types.h"
 #include "renderer.h"
@@ -109,35 +110,46 @@ void draw_lane(Renderer* renderer, Note* seek, int ms, bool top_lane) {
 */
 
 void r_init(Renderer* renderer) {
-    glGenTextures(1, &renderer->texture);
-    glBindTexture(GL_TEXTURE_2D, renderer->texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    static const float note_vertices[] = {
+        -40.0, -40.0,
+        40.0, -40.0,
+        40.0, 40.0,
 
-    float vertices[] = {
-        -1.0, 1.0,      0.0, 0.0,
-        -1.0, -1.0,     0.0, 1.0,
-        1.0, -1.0,      1.0, 1.0,
-
-        -1.0, 1.0,      0.0, 0.0,
-        1.0, -1.0,      1.0, 1.0,
-        1.0, 1.0,       1.0, 0.0
+        -40.0, -40.0,
+        40.0, 40.0,
+        -40.0, 40.0
     };
 
+    // vao
     glGenVertexArrays(1, &renderer->vao);
-    glGenBuffers(1, &renderer->vbo);
     glBindVertexArray(renderer->vao);
+
+    // vbo for vertices
+    glGenBuffers(1, &renderer->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, renderer->vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(note_vertices), note_vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void *)(0));
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
+
+    // vbo for instance attributes
+    glGenBuffers(1, &renderer->instance_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, renderer->instance_vbo);
+    glBufferData(GL_ARRAY_BUFFER, 256*sizeof(Note), NULL, GL_DYNAMIC_DRAW);
+
+    // instance angle
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void *)(2 * sizeof(float)));
-    glBindVertexArray(0);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(RNote), (void*)offsetof(RNote, angle));
+    glVertexAttribDivisor(1, 1);
+
+    // instance x
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(RNote), (void*)offsetof(RNote, x));
+    glVertexAttribDivisor(2, 1);
+
+    // instance y
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(RNote), (void*)offsetof(RNote, y));
+    glVertexAttribDivisor(3, 1);
 
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &game_vert, NULL);
@@ -158,25 +170,31 @@ void r_init(Renderer* renderer) {
     glDeleteShader(vs);
     glDeleteShader(fs);
 
-    renderer->buffer_uniform = glGetUniformLocation(renderer->shader, "buffer");
-
     glUseProgram(renderer->shader);
-    glBindTexture(GL_TEXTURE_2D, renderer->texture);
-    glActiveTexture(GL_TEXTURE0);
-    glUniform1i(renderer->buffer_uniform, 0);
-    glBindVertexArray(renderer->vao);
+    GLint screen_size_uniform = glGetUniformLocation(renderer->shader, "u_screen_size");
+    glUniform2f(screen_size_uniform, (float)WIDTH, (float)HEIGHT);
+
+    glBindVertexArray(0);
 }
 
 void r_draw(Renderer* renderer, Track track) {
+    static const RNote r_notes[] = {
+        { 0.5, 100.0, 100.0 },
+        { 0.0, 150.0, 120.0 },
+        { 1.0, 200.0, 150.0 }
+    };
+    
     int height = atomic_load(renderer->window_height_ptr);
-    clear_buffer(renderer);
-    draw_bg(renderer);
-    draw_lane(renderer, track.top_seek, track.ms, true);
-    draw_lane(renderer, track.bottom_seek, track.ms, false);
 
     glClear(GL_COLOR_BUFFER_BIT);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderer->buffer);
     glViewport(0, 0, (float)height * RATIO, height);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glBindBuffer(GL_ARRAY_BUFFER, renderer->instance_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 256*sizeof(RNote), r_notes);
+
+    glUseProgram(renderer->shader);
+    glBindVertexArray(renderer->vao);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 3);   // 3 = 3 INSTANCES!!
+    glBindVertexArray(0);
 }
 
